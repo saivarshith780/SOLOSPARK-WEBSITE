@@ -207,7 +207,8 @@ export type Build = {
 export const builds: Build[] = [
   {
     slug: 'ai-phone-ordering-agent',
-    name: 'AI phone-ordering agent for a local Italian restaurant',
+    // \u2011 is a non-breaking hyphen, so headings never break inside the word
+    name: 'AI phone\u2011ordering agent for a local Italian restaurant',
     status: 'Built, not launched',
     summary:
       'Customers call the restaurant and place their order by talking to an AI agent.',
@@ -227,7 +228,7 @@ export const builds: Build[] = [
   },
   {
     slug: 'research-and-apply-pipeline',
-    name: 'Research-and-apply pipeline in n8n',
+    name: 'Research\u2011and\u2011apply pipeline in n8n',
     status: 'Reusable pattern',
     summary:
       'A pipeline that finds opportunities, scores each one, writes a tailored document for it and sends it out.',

@@ -36,18 +36,18 @@ const faqLd = {
 >
   <!-- Hero: the one orchestrated moment. Copy rises in, then the circuit lights up. -->
   <section class="relative" aria-labelledby="hero-heading">
-    <div class="page-x grid items-center gap-14 pt-12 pb-20 md:pt-20 md:pb-28 lg:grid-cols-[1.05fr_1fr] lg:gap-12">
+    <div class="hero-grid page-x screen-fill items-center gap-x-[clamp(2rem,5vw,6rem)] gap-y-12 py-[clamp(1.25rem,5svh,3.5rem)] md:gap-y-8 lg:grid-cols-[1.05fr_1fr]">
       <div>
         <h1 id="hero-heading" class="type-display text-lit load-in max-w-[12ch]">Get your team out of copy&#8209;paste.</h1>
-        <p class="lede load-in mt-7" style="--d:120ms">
+        <p class="hero-lede lede load-in mt-7" style="--d:120ms">
           I build AI agents and automations for small and mid-sized ops teams. They take over the data entry,
           sorting and follow-ups that fill your week, so your people get hours back and fewer things slip.
         </p>
-        <div class="load-in mt-10 flex flex-wrap items-center gap-3" style="--d:220ms">
+        <div class="hero-ctas load-in mt-10 flex flex-wrap items-center gap-3" style="--d:220ms">
           <BookButton />
           <a href="/work" class="btn btn-ghost">See what I've built</a>
         </div>
-        <p class="load-in mt-6 flex items-center gap-2.5 text-step--1 text-haze" style="--d:320ms">
+        <p class="hero-note load-in mt-6 flex items-center gap-2.5 text-step--1 text-haze" style="--d:320ms">
           <Spark class="h-3.5 w-3.5 flex-none" />
           Free {site.call.length} intro. You talk to the engineer who builds it.
         </p>
@@ -59,7 +59,7 @@ const faqLd = {
   </section>
 
   <!-- Problem -->
-  <section class="section-y seam relative" aria-labelledby="problem-heading">
+  <section class="section-y seam relative pt-[calc(var(--spacing-section)*0.7)]" aria-labelledby="problem-heading">
     <div class="glow glow-deep absolute top-1/2 right-[-8%] h-[38rem] w-[min(52rem,120vw)] -translate-y-1/2 opacity-80" aria-hidden="true"></div>
     <div class="page-x relative grid gap-12 md:grid-cols-2 md:items-center md:gap-16">
       <div data-reveal>
@@ -230,6 +230,34 @@ const faqLd = {
   @media (min-width: 64rem) {
     .console-cell + .console-cell {
       box-shadow: -1px 0 0 var(--color-line);
+    }
+  }
+
+  /* Short screens (1366x768, 1280x720 laptops): tighten the hero's rhythm so
+     the whole first screen fits above the fold. */
+  @media (max-height: 44rem) and (min-width: 64rem) {
+    .hero-lede {
+      margin-top: 1.25rem;
+    }
+    .hero-ctas {
+      margin-top: 1.75rem;
+    }
+    .hero-note {
+      margin-top: 1rem;
+    }
+  }
+
+  /* Line up each row across the three services (title, text, outcome, link)
+     whatever the length of each description. */
+  @media (min-width: 64rem) {
+    .console {
+      grid-template-rows: repeat(5, auto);
+    }
+    .console-cell {
+      display: grid;
+      grid-row: span 5;
+      grid-template-rows: subgrid;
+      row-gap: 0;
     }
   }
 
