@@ -1,5 +1,6 @@
 ---
 import { site } from '../config/site';
+import EmailLink from './EmailLink.astro';
 const fields: { id: string; label: string; type: 'text' | 'email'; autocomplete: 'name' | 'email' | 'organization'; required: boolean }[] = [
   { id: 'name', label: 'Your name', type: 'text', autocomplete: 'name', required: true },
   { id: 'email', label: 'Work email', type: 'email', autocomplete: 'email', required: true },
@@ -74,8 +75,8 @@ const fields: { id: string; label: string; type: 'text' | 'email'; autocomplete:
     <div class="status-error rounded-sm border-2 border-danger bg-white p-5" hidden>
       <p class="font-display text-step-1 font-bold">Your message didn't send.</p>
       <p class="mt-1 text-slate">
-        Please try again, or email me directly at
-        <a class="link break-all" href={`mailto:${site.contact.email}`}>{site.contact.email}</a>.
+        Please try again, or email me directly at{' '}
+        <EmailLink />.
       </p>
     </div>
   </div>

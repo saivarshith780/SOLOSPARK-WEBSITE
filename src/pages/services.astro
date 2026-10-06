@@ -42,7 +42,7 @@ const serviceLd = services.map((s) => ({
     >
       <div class="page-x grid gap-10 lg:grid-cols-[1fr_1.3fr] lg:gap-16">
         <div>
-          <h2 id={`${s.slug}-heading`} class="h-section">{s.name}</h2>
+          <h2 id={`${s.slug}-heading`} class="type-section">{s.name}</h2>
           <p class="mt-5 text-step-1">{s.summary}</p>
           <p class="mt-6 inline-block rounded-sm bg-spark px-3 py-1.5 font-bold text-ink">{s.outcome}</p>
           <div class="mt-8">
@@ -68,13 +68,15 @@ const serviceLd = services.map((s) => ({
   ))}
 
   <section class="section-y" aria-labelledby="unsure-heading">
-    <div class="page-x max-w-[48rem]!">
-      <h2 id="unsure-heading" class="h-section">Not sure which one you need?</h2>
+    <div class="page-x">
+      <div class="max-w-[46rem]">
+      <h2 id="unsure-heading" class="type-section">Not sure which one you need?</h2>
       <p class="mt-5 text-step-1 text-slate">
         That's normal. Tell me what the work looks like today and I'll tell you which approach fits. Often it's a
         mix: an automation that moves the data, with one AI step in the middle.
       </p>
       <div class="mt-8"><BookButton variant="ink" /></div>
+      </div>
     </div>
   </section>
 

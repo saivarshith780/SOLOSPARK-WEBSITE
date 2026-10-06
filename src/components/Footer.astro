@@ -1,6 +1,7 @@
 ---
 import { site, nav } from '../config/site';
 import Logo from './Logo.astro';
+import EmailLink from './EmailLink.astro';
 const year = new Date().getFullYear();
 const socials = [
   { label: 'LinkedIn', href: site.social.linkedin },
@@ -8,8 +9,8 @@ const socials = [
 ].filter((s) => s.href);
 ---
 <footer class="on-dark bg-cobalt-deep text-white">
-  <div class="page-x grid gap-10 py-14 md:grid-cols-[1.4fr_1fr_1fr]">
-    <div>
+  <div class="page-x grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-[1.3fr_0.7fr_1.4fr]">
+    <div class="sm:col-span-2 lg:col-span-1">
       <Logo tone="light" class="h-8 w-auto" />
       <p class="mt-4 max-w-sm text-mist">
         AI agents and automations, built by {site.founder.name}.
@@ -26,7 +27,7 @@ const socials = [
     <div>
       <h2 class="font-display text-step-1">Get in touch</h2>
       <ul class="mt-3 space-y-2">
-        <li><a class="link break-all" href={`mailto:${site.contact.email}`}>{site.contact.email}</a></li>
+        <li><EmailLink /></li>
         <li><a class="link" href={site.contact.phoneHref}>{site.contact.phone}</a></li>
         {socials.map((s) => <li><a class="link" href={s.href} rel="me noopener" target="_blank">{s.label}</a></li>)}
       </ul>

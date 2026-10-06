@@ -1,13 +1,13 @@
 ---
 import { steps } from '../config/site';
 ---
-<ol class="steps relative grid gap-10 md:grid-cols-4 md:gap-8">
+<ol class="steps relative grid gap-10 lg:grid-cols-4 lg:gap-8">
   {steps.map((step, i) => (
-    <li class="step relative pl-16 md:pl-0 md:pt-16">
+    <li class="step relative pl-16 lg:pl-0 lg:pt-16">
       <span class="step-num absolute top-0 left-0 inline-flex h-11 w-11 items-center justify-center rounded-full border-2 border-ink bg-paper font-display text-step-1 font-bold">
         {i + 1}
       </span>
-      <h3 class="h-card">{step.title}</h3>
+      <h3 class="type-card">{step.title}</h3>
       <p class="mt-2 text-slate">{step.body}</p>
     </li>
   ))}
@@ -24,7 +24,7 @@ import { steps } from '../config/site';
     width: 2px;
     background: var(--color-line);
   }
-  @media (min-width: 48rem) {
+  @media (min-width: 64rem) {
     .steps::before {
       left: 22px;
       right: 0;

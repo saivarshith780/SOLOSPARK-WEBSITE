@@ -12,9 +12,9 @@ const {
 } = Astro.props;
 ---
 <section class="on-dark relative overflow-hidden bg-cobalt text-white" aria-labelledby="cta-heading">
-  <Spark class="pointer-events-none absolute -right-16 -bottom-20 h-72 w-72 opacity-90 md:right-12 md:-bottom-10 md:h-80 md:w-80" />
+  <Spark class="pointer-events-none absolute right-12 -bottom-10 hidden h-80 w-80 lg:block" />
   <div class="page-x section-y relative">
-    <h2 id="cta-heading" class="h-section max-w-[18ch]">{heading}</h2>
+    <h2 id="cta-heading" class="type-section max-w-[18ch]">{heading}</h2>
     <p class="lede mt-5 text-mist">{body}</p>
     <div class="mt-8 flex flex-wrap items-center gap-x-6 gap-y-4">
       <BookButton />

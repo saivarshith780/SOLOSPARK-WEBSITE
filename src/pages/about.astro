@@ -4,6 +4,7 @@ import path from 'node:path';
 import Base from '../layouts/Base.astro';
 import CtaBand from '../components/CtaBand.astro';
 import Spark from '../components/Spark.astro';
+import EmailLink from '../components/EmailLink.astro';
 import { site, tools } from '../config/site';
 
 // Headshot: put a square photo at public/images/sai.jpg and it replaces the placeholder.
@@ -16,7 +17,7 @@ const hasHeadshot = fs.existsSync(path.join(process.cwd(), 'public', site.founde
   <section class="border-b border-line">
     <div class="page-x grid gap-12 pt-14 pb-14 md:grid-cols-[1fr_auto] md:items-end md:pt-20 md:pb-20">
       <div>
-        <h1 class="h-display max-w-[14ch]">Hi, I'm {site.founder.firstName}.</h1>
+        <h1 class="type-display max-w-[14ch]">Hi, I'm {site.founder.firstName}.</h1>
         <p class="lede mt-6 text-slate">
           I'm {site.founder.name}, {site.founder.title} of {site.legalName}. I build AI agents and automations
           for small and mid-sized businesses.
@@ -46,14 +47,14 @@ const hasHeadshot = fs.existsSync(path.join(process.cwd(), 'public', site.founde
   <section class="section-y" aria-labelledby="story-heading">
     <div class="page-x grid gap-12 lg:grid-cols-[1.4fr_1fr] lg:gap-20">
       <div class="max-w-[38rem] space-y-5 text-step-1">
-        <h2 id="story-heading" class="h-section">Why I work this way</h2>
+        <h2 id="story-heading" class="type-section">Why I work this way</h2>
         <p>
           I'm an AI automation engineer, and n8n is my specialty. I hold an {site.founder.education}. Most of my
           work is taking a process that people do by hand, step by step, and building a system that does those
           steps for them.
         </p>
         <p>
-          I started Solo Spark to work directly with the people who own that work: ops managers, office managers,
+          I work directly with the people who own that work: ops managers, office managers,
           COOs and owners. You explain how things get done today. I build something that fits it.
         </p>
         <p>
@@ -83,7 +84,7 @@ const hasHeadshot = fs.existsSync(path.join(process.cwd(), 'public', site.founde
         <div class="border-t-2 border-ink pt-5">
           <h2 class="font-display text-step-1">Reach me</h2>
           <ul class="mt-2 space-y-1">
-            <li><a class="link break-all" href={`mailto:${site.contact.email}`}>{site.contact.email}</a></li>
+            <li><EmailLink /></li>
             <li><a class="link" href={site.contact.phoneHref}>{site.contact.phone}</a></li>
           </ul>
         </div>
