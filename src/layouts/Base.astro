@@ -122,17 +122,24 @@ const schemas = [business, founder, website, ...jsonLd];
               if (!entry.isIntersecting) return;
               var el = entry.target;
               io.unobserve(el);
-              if (el.hasAttribute('data-reveal') && el.animate) {
+              if (el.hasAttribute('data-reveal') && el.animate && !el.classList.contains('is-in')) {
                 var i = parseFloat(getComputedStyle(el).getPropertyValue('--i')) || 0;
-                el.animate(
+                var anim = el.animate(
                   [{ opacity: 0, translate: '0 24px' }, { opacity: 1, translate: '0 0' }],
                   { duration: 950, delay: i * 90, easing: 'cubic-bezier(0.16, 1, 0.3, 1)', fill: 'backwards' }
                 );
+                // Lets the companion re-measure once things have settled
+                anim.finished.then(function () { document.dispatchEvent(new Event('reveal-done')); }, function () {});
               }
               el.classList.add('is-in');
             });
           }, { rootMargin: '0px 0px -10% 0px' });
           els.forEach(function (el) { io.observe(el); });
+          // Tabbing into something that hasn't been revealed yet shows it at once
+          document.addEventListener('focusin', function (e) {
+            var r = e.target.closest && e.target.closest('[data-reveal]:not(.is-in)');
+            if (r) r.classList.add('is-in');
+          });
         }
         if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
         else start();

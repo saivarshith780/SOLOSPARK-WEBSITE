@@ -55,7 +55,8 @@
   /* Layout. All rem-based, so it grows with the fluid root size set on html. */
   --spacing-gutter: clamp(1.25rem, 0.4rem + 3.2vw, 3.5rem);
   --spacing-section: clamp(4.5rem, 2rem + 7vw, 8.5rem);
-  --container-page: 84rem;
+  /* Grows on very wide screens (ultrawide gets a wider layout, not a narrow column) */
+  --container-page: clamp(84rem, 62vw, 110rem);
   --container-prose: 40rem;
 
   /* Radius by hierarchy: panels > cards > tiles and inputs > pills */
@@ -287,6 +288,7 @@
     color: var(--color-volt);
   }
   .prose-ss a {
+    overflow-wrap: anywhere; /* long email addresses on small phones */
     color: var(--color-volt);
     text-decoration: underline;
     text-decoration-color: rgb(142 162 255 / 0.5);
@@ -719,6 +721,10 @@
   /* Revealed on scroll by the script in Base.astro */
   .js [data-reveal]:not(.is-in) {
     opacity: 0;
+  }
+  /* Never hide something that has keyboard focus */
+  .js [data-reveal]:not(.is-in):focus-within {
+    opacity: 1;
   }
   .drift-a {
     animation: drift-a 26s var(--ease-in-out-sine) infinite alternate;

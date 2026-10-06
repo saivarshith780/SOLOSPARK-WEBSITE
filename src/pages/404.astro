@@ -1,6 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import SparkOrb from '../components/SparkOrb.astro';
+import HeroOrbit from '../components/HeroOrbit.astro';
 import { nav } from '../config/site';
 ---
 <Base
@@ -10,7 +11,8 @@ import { nav } from '../config/site';
   noindex
 >
   <section class="section-y">
-    <div class="page-x">
+    <div class="page-x grid items-center gap-x-[clamp(2rem,5vw,6rem)] lg:min-h-[min(60svh,40rem)] lg:grid-cols-[1.5fr_1fr]">
+      <div>
       <div class="load-in flex items-center gap-4">
         <SparkOrb class="h-12 w-12" />
         <p class="font-display text-step-1 font-bold text-volt">Error 404</p>
@@ -25,6 +27,10 @@ import { nav } from '../config/site';
           {nav.map((n) => <li><a class="link" href={n.href}>{n.label}</a></li>)}
         </ul>
       </nav>
+      </div>
+      <div class="load-in hidden justify-end lg:flex" style="--d:200ms">
+        <HeroOrbit />
+      </div>
     </div>
   </section>
 </Base>
