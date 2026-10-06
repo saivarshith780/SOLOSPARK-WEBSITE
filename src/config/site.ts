@@ -23,7 +23,8 @@ export const site = {
     role: 'AI automation engineer',
     specialty: 'n8n',
     education: 'MS in Data Science, NJIT',
-    // Drop a square photo at public/images/sai.jpg and it appears on the About page.
+    // TODO: save a square photo as public/images/sai.jpg. It replaces the
+    // placeholder on the About page on the next build.
     headshot: '/images/sai.jpg',
   },
 
