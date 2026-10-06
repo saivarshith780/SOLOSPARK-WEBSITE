@@ -1,0 +1,10 @@
+---
+// Email link that wraps neatly at the "@" on narrow screens.
+import { site } from '../config/site';
+interface Props {
+  class?: string;
+}
+const { class: className = '' } = Astro.props;
+const [user, domain] = site.contact.email.split('@');
+---
+<a class:list={['link', className]} href={`mailto:${site.contact.email}`}>{user}<wbr />@{domain}</a>

@@ -1,0 +1,19 @@
+---
+import { wordmarkPath, sparkPath } from '../lib/logo';
+interface Props {
+  tone?: 'dark' | 'light';
+  class?: string;
+}
+const { tone = 'dark', class: className = '' } = Astro.props;
+const text = tone === 'light' ? 'var(--color-white)' : 'var(--color-ink)';
+---
+<svg
+  class={className}
+  viewBox="0 -760 4700 920"
+  role="img"
+  aria-label="Solo Spark"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <path fill="var(--color-spark)" transform="translate(0 -720) scale(32)" d={sparkPath}></path>
+  <path fill={text} transform="translate(940 0)" d={wordmarkPath}></path>
+</svg>

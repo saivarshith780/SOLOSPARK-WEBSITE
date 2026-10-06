@@ -1,0 +1,11 @@
+---
+import { sparkPath } from '../lib/logo';
+interface Props {
+  class?: string;
+  color?: string;
+}
+const { class: className = '', color = 'var(--color-spark)' } = Astro.props;
+---
+<svg class={className} viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+  <path fill={color} d={sparkPath}></path>
+</svg>

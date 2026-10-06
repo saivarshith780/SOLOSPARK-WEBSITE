@@ -1,0 +1,110 @@
+---
+import { nav } from '../config/site';
+import Logo from './Logo.astro';
+import BookButton from './BookButton.astro';
+const path = Astro.url.pathname.replace(/\.html$/, '').replace(/\/$/, '') || '/';
+---
+<header class="relative z-20 border-b border-line bg-paper">
+  <div class="page-x flex h-18 items-center justify-between gap-4">
+    <a href="/" class="-m-2 rounded-sm p-2" aria-label="Solo Spark home">
+      <Logo class="h-7 w-auto md:h-8" />
+    </a>
+
+    <nav aria-label="Main" class="hidden md:block">
+      <ul class="flex items-center gap-1">
+        {nav.map((item) => (
+          <li>
+            <a
+              href={item.href}
+              class="nav-link rounded-sm px-3 py-2 font-display text-[1.0625rem] font-semibold"
+              aria-current={path === item.href ? 'page' : undefined}
+            >
+              {item.label}
+            </a>
+          </li>
+        ))}
+        <li class="ml-3"><BookButton variant="ink" class="min-h-11! py-2.5!" /></li>
+      </ul>
+    </nav>
+
+    <button
+      type="button"
+      class="menu-btn inline-flex h-11 w-11 items-center justify-center rounded-sm md:hidden"
+      aria-expanded="false"
+      aria-controls="mobile-menu"
+    >
+      <span class="sr-only">Menu</span>
+      <svg viewBox="0 0 24 24" class="h-6 w-6" aria-hidden="true">
+        <path class="bar-open" d="M3 7h18M3 12h18M3 17h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+        <path class="bar-close" d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+      </svg>
+    </button>
+  </div>
+
+  <nav id="mobile-menu" aria-label="Main" class="mobile-menu border-t border-line bg-paper md:hidden" hidden>
+    <ul class="page-x flex flex-col py-4">
+      {nav.map((item) => (
+        <li>
+          <a
+            href={item.href}
+            class="nav-link block rounded-sm py-3 font-display text-step-2 font-bold"
+            aria-current={path === item.href ? 'page' : undefined}
+          >
+            {item.label}
+          </a>
+        </li>
+      ))}
+      <li class="pt-4"><BookButton variant="ink" class="w-full" /></li>
+    </ul>
+  </nav>
+</header>
+
+<style>
+  .nav-link {
+    text-decoration: none;
+    background-image: linear-gradient(var(--color-spark), var(--color-spark));
+    background-size: 0 3px;
+    background-repeat: no-repeat;
+    background-position: 0.75rem calc(100% - 4px);
+    transition: background-size 200ms var(--ease-out-quart);
+  }
+  .mobile-menu .nav-link {
+    background-position: 0 calc(100% - 6px);
+  }
+  .nav-link:hover,
+  .nav-link[aria-current='page'] {
+    background-size: calc(100% - 1.5rem) 3px;
+  }
+  .mobile-menu .nav-link:hover,
+  .mobile-menu .nav-link[aria-current='page'] {
+    background-size: 3rem 4px;
+  }
+  .bar-close {
+    display: none;
+  }
+  .menu-btn[aria-expanded='true'] .bar-open {
+    display: none;
+  }
+  .menu-btn[aria-expanded='true'] .bar-close {
+    display: inline;
+  }
+</style>
+
+<script>
+  const btn = document.querySelector<HTMLButtonElement>('.menu-btn');
+  const menu = document.getElementById('mobile-menu');
+  if (btn && menu) {
+    const set = (open: boolean) => {
+      btn.setAttribute('aria-expanded', String(open));
+      menu.hidden = !open;
+    };
+    btn.addEventListener('click', () => set(btn.getAttribute('aria-expanded') !== 'true'));
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && btn.getAttribute('aria-expanded') === 'true') {
+        set(false);
+        btn.focus();
+      }
+    });
+    matchMedia('(min-width: 48rem)').addEventListener('change', (e) => e.matches && set(false));
+  }
+</script>

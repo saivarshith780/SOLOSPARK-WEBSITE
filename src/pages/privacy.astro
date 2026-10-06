@@ -1,0 +1,81 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import { site } from '../config/site';
+// TODO: set this to the date you publish or change the policy.
+const updated = 'October 6, 2026';
+---
+<Base
+  title="Privacy Policy | Solo Spark LLC, AI Automation Consultancy"
+  description="How Solo Spark LLC handles the information you send through the mysolospark.com contact form, including how Web3Forms delivers it."
+>
+  <PageHero title="Privacy policy" lede={`Last updated ${updated}.`} />
+
+  <section class="section-y pt-12!">
+    <div class="page-x">
+      <div class="prose-ss">
+        <p>
+          This policy explains what {site.legalName} ("Solo Spark", "I", "me") collects through
+          {' '}<a href={site.url}>mysolospark.com</a> and what I do with it. I keep it short because I collect very little.
+        </p>
+
+        <h2>What I collect</h2>
+        <p>When you send the contact form, I receive:</p>
+        <ul>
+          <li>your name,</li>
+          <li>your email address,</li>
+          <li>your company name, if you give it,</li>
+          <li>your message about what you want to automate.</li>
+        </ul>
+        <p>
+          The site doesn't use cookies for tracking, advertising or analytics, and it doesn't ask you to create an account.
+          Like most websites, the server that hosts this site may keep standard technical logs (such as IP address and
+          browser type) for security and reliability.
+        </p>
+
+        <h2>How the contact form works</h2>
+        <p>
+          The form is delivered by <a href="https://web3forms.com" rel="noopener" target="_blank">Web3Forms</a>, a
+          form-to-email service. When you press send, your entries go to Web3Forms, which forwards them to my email
+          inbox. Web3Forms processes that data under its own
+          {' '}<a href="https://web3forms.com/privacy" rel="noopener" target="_blank">privacy policy</a>.
+        </p>
+        <p>
+          The form also contains a hidden field that people never see. If it's filled in, I treat the submission as
+          spam and don't send it.
+        </p>
+
+        <h2>How I use your information</h2>
+        <ul>
+          <li>to reply to your message,</li>
+          <li>to talk with you about a possible project,</li>
+          <li>to keep a record of our conversation.</li>
+        </ul>
+        <p>I don't sell your information, and I don't add you to a mailing list.</p>
+
+        <h2>How long I keep it</h2>
+        <p>
+          I keep messages in my email for as long as they're useful for our conversation or any work we do together.
+          You can ask me to delete them at any time.
+        </p>
+
+        <h2>Your choices</h2>
+        <p>
+          You can ask to see, correct or delete the information you sent me. Email
+          {' '}<a href={`mailto:${site.contact.email}`}>{site.contact.email}</a> and I'll take care of it.
+        </p>
+
+        <h2>Changes to this policy</h2>
+        <p>If this policy changes, I'll update it on this page and change the date at the top.</p>
+
+        <h2>Contact</h2>
+        <p>
+          {site.legalName}<br />
+          {site.location.city}, {site.location.region}<br />
+          <a href={`mailto:${site.contact.email}`}>{site.contact.email}</a><br />
+          <a href={site.contact.phoneHref}>{site.contact.phone}</a>
+        </p>
+      </div>
+    </div>
+  </section>
+</Base>
