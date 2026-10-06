@@ -1,0 +1,48 @@
+---
+// A small line drawing for each service, set in a lit tile.
+// ai-agents: a spark inside the agent's ring. workflow-automation: two inputs
+// wired into one output. llm-integrations: a document being read.
+import { sparkPath } from '../lib/logo';
+interface Props {
+  slug: string;
+  class?: string;
+}
+const { slug, class: className = '' } = Astro.props;
+---
+<span class:list={['glyph inline-flex h-12 w-12 flex-none items-center justify-center rounded-tile', className]} aria-hidden="true">
+  <svg viewBox="0 0 24 24" class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+    {slug === 'ai-agents' && (
+      <>
+        <circle cx="12" cy="12" r="9.25"></circle>
+        <path d={sparkPath} transform="translate(6.6 6.6) scale(0.45)" fill="var(--color-spark)" stroke="none"></path>
+      </>
+    )}
+    {slug === 'workflow-automation' && (
+      <>
+        <circle cx="5" cy="6" r="2.25"></circle>
+        <circle cx="5" cy="18" r="2.25"></circle>
+        <circle cx="19" cy="12" r="2.25" fill="var(--color-spark)" stroke="var(--color-spark)"></circle>
+        <path d="M7.25 6H10a3 3 0 0 1 3 3v0a3 3 0 0 0 3 3h.75M7.25 18H10a3 3 0 0 0 3-3v0a3 3 0 0 1 3-3"></path>
+      </>
+    )}
+    {slug === 'llm-integrations' && (
+      <>
+        <path d="M14 3H7.5A2.5 2.5 0 0 0 5 5.5v13A2.5 2.5 0 0 0 7.5 21h9a2.5 2.5 0 0 0 2.5-2.5V8z"></path>
+        <path d="M14 3v3.5A1.5 1.5 0 0 0 15.5 8H19"></path>
+        <path d="M8.5 12.5h7M8.5 16h4.5"></path>
+        <circle cx="16.75" cy="16" r="1.1" fill="var(--color-spark)" stroke="none"></circle>
+      </>
+    )}
+  </svg>
+</span>
+
+<style>
+  .glyph {
+    color: var(--color-volt);
+    background: linear-gradient(180deg, rgb(142 162 255 / 0.16), rgb(142 162 255 / 0.04));
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.12),
+      inset 0 0 0 1px rgb(142 162 255 / 0.25),
+      0 10px 30px -12px rgb(58 91 255 / 0.6);
+  }
+</style>

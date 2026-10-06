@@ -5,7 +5,7 @@ interface Props {
   class?: string;
 }
 const { tone = 'dark', class: className = '' } = Astro.props;
-const text = tone === 'light' ? 'var(--color-white)' : 'var(--color-ink)';
+const text = tone === 'light' ? 'var(--color-snow)' : 'var(--color-night)';
 ---
 <svg
   class={className}
@@ -14,6 +14,8 @@ const text = tone === 'light' ? 'var(--color-white)' : 'var(--color-ink)';
   aria-label="Solo Spark"
   xmlns="http://www.w3.org/2000/svg"
 >
-  <path fill="var(--color-spark)" transform="translate(0 -720) scale(32)" d={sparkPath}></path>
+  <g class="logo-spark">
+    <path fill="var(--color-spark)" transform="translate(0 -720) scale(32)" d={sparkPath}></path>
+  </g>
   <path fill={text} transform="translate(940 0)" d={wordmarkPath}></path>
 </svg>

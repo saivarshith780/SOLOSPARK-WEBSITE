@@ -5,10 +5,10 @@ interface Props {
 }
 const { title, lede } = Astro.props;
 ---
-<section class="border-b border-line">
-  <div class="page-x pt-14 pb-12 md:pt-20 md:pb-16">
-    <h1 class="type-display max-w-[16ch]">{title}</h1>
-    {lede && <p class="lede mt-6 text-slate">{lede}</p>}
-    <slot />
+<section class="page-hero relative">
+  <div class="page-x pt-16 pb-16 md:pt-24 md:pb-24">
+    <h1 class="type-display text-lit load-in max-w-[16ch]">{title}</h1>
+    {lede && <p class="lede load-in mt-7" style="--d:120ms">{lede}</p>}
+    <div class="load-in" style="--d:220ms"><slot /></div>
   </div>
 </section>

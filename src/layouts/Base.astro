@@ -69,6 +69,7 @@ const schemas = [business, founder, website, ...jsonLd];
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
     <title>{title}</title>
     <meta name="description" content={description} />
     {noindex ? <meta name="robots" content="noindex, follow" /> : <link rel="canonical" href={canonical} />}
@@ -79,7 +80,7 @@ const schemas = [business, founder, website, ...jsonLd];
     <link rel="icon" href="/favicon.ico" sizes="32x32" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="sitemap" href="/sitemap-index.xml" />
-    <meta name="theme-color" content="#1B36C9" />
+    <meta name="theme-color" content="#05081A" />
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={site.name} />
@@ -98,13 +99,89 @@ const schemas = [business, founder, website, ...jsonLd];
     <meta name="twitter:image" content={ogImage} />
 
     {schemas.map((s) => <script type="application/ld+json" set:html={JSON.stringify(s)} />)}
+
+    <!--
+      Scroll reveals. Inline so it runs before first paint: the "js" class and the
+      observer arrive together, so content is never left hidden if scripts fail.
+      [data-reveal] fades and rises into view (stagger with style="--i: n").
+      [data-inview] only gets the "is-in" class, for CSS-driven effects.
+    -->
+    <script is:inline>
+      document.documentElement.classList.add('js');
+      (function () {
+        var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        function start() {
+          var els = document.querySelectorAll('[data-reveal],[data-inview]');
+          if (reduce || !('IntersectionObserver' in window)) {
+            els.forEach(function (el) { el.classList.add('is-in'); });
+            return;
+          }
+          var io = new IntersectionObserver(function (entries) {
+            entries.forEach(function (entry) {
+              if (!entry.isIntersecting) return;
+              var el = entry.target;
+              io.unobserve(el);
+              if (el.hasAttribute('data-reveal') && el.animate) {
+                var i = parseFloat(getComputedStyle(el).getPropertyValue('--i')) || 0;
+                el.animate(
+                  [{ opacity: 0, translate: '0 24px' }, { opacity: 1, translate: '0 0' }],
+                  { duration: 950, delay: i * 90, easing: 'cubic-bezier(0.16, 1, 0.3, 1)', fill: 'backwards' }
+                );
+              }
+              el.classList.add('is-in');
+            });
+          }, { rootMargin: '0px 0px -10% 0px' });
+          els.forEach(function (el) { io.observe(el); });
+        }
+        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
+        else start();
+      })();
+    </script>
   </head>
   <body class="flex min-h-dvh flex-col">
-    <a href="#main" class="sr-only z-50 rounded-sm bg-ink px-4 py-3 text-white focus:not-sr-only focus:fixed focus:top-3 focus:left-3">Skip to content</a>
+    <a href="#main" class="sr-only z-50 rounded-pill bg-snow px-5 py-3 font-bold text-night focus:not-sr-only focus:fixed focus:top-3 focus:left-3">Skip to content</a>
+
+    <!-- Ambient light behind the header and first section -->
+    <div class="sky" aria-hidden="true">
+      <div class="sky-beam"></div>
+      <div class="sky-grid"></div>
+      <div class="glow glow-cobalt drift-a absolute -top-[26rem] left-[58%] h-[50rem] w-[min(84rem,150vw)] -translate-x-1/2"></div>
+      <div class="glow glow-deep drift-b absolute -top-48 -left-72 h-[38rem] w-[54rem]"></div>
+    </div>
+
     <Header />
-    <main id="main" class="flex-1">
+    <main id="main" class="flex-1 overflow-x-clip">
       <slot />
     </main>
     <Footer />
   </body>
 </html>
+
+<script>
+  // Cursor-following light on [data-spotlight] cards and panels (mouse only).
+  if (matchMedia('(hover: hover) and (pointer: fine)').matches) {
+    let frame = 0;
+    let target: HTMLElement | null = null;
+    let x = 0;
+    let y = 0;
+    const paint = () => {
+      frame = 0;
+      if (!target) return;
+      const r = target.getBoundingClientRect();
+      target.style.setProperty('--mx', `${x - r.left}px`);
+      target.style.setProperty('--my', `${y - r.top}px`);
+    };
+    document.addEventListener(
+      'pointermove',
+      (e) => {
+        const el = (e.target as Element | null)?.closest<HTMLElement>('[data-spotlight]');
+        if (!el) return;
+        target = el;
+        x = e.clientX;
+        y = e.clientY;
+        if (!frame) frame = requestAnimationFrame(paint);
+      },
+      { passive: true },
+    );
+  }
+</script>

@@ -3,7 +3,7 @@
 The marketing site for **Solo Spark LLC**: https://mysolospark.com
 
 Built with [Astro](https://astro.build) + [Tailwind CSS](https://tailwindcss.com) + TypeScript.
-It builds to plain static HTML, so it runs on any static host. The only JavaScript is the mobile menu and the contact form.
+It builds to plain static HTML, so it runs on any static host. The only JavaScript is the mobile menu, the contact form, and a few small motion helpers (scroll reveals, the header's frosted state, the cursor light on cards).
 
 ## Run it locally
 
@@ -54,17 +54,32 @@ Page text that isn't in the config lives in `src/pages/*.astro` (one file per pa
 
 ### Design tokens
 
-Colors, fonts, type scale and spacing are defined once in [`src/styles/global.css`](src/styles/global.css) inside the `@theme` block. Tailwind turns them into classes (`bg-cobalt`, `text-ink`, `font-display`, …).
+Colors, fonts, type scale, spacing and radius are defined once in [`src/styles/global.css`](src/styles/global.css) inside the `@theme` block. Tailwind turns them into classes (`bg-night`, `text-mist`, `font-display`, `rounded-card`, …).
+
+The direction is **"blue hour, one warm spark"**: the brand ink is deepened into a night-blue base so the cobalt can glow like light, and spark yellow is the only warm light on the page.
 
 | Token | Value | Use |
 |-------|-------|-----|
-| `cobalt` | `#1B36C9` | Brand surface (hero, CTA band) |
-| `ink` | `#0E1433` | Body text |
-| `paper` | `#F3F5FA` | Page background |
-| `spark` | `#FFC933` | The one accent: CTA buttons and the spark mark only |
-| `slate` / `mist` | `#4A5274` / `#C9D2F5` | Secondary text on light / dark |
+| `night` | `#05081A` | Page background |
+| `night-1` | `#0A0F2A` | Raised bands (footer) |
+| `snow` | `#F2F4FF` | Headings and body text (18:1 on night) |
+| `mist` / `haze` | `#B4BEE6` / `#8A95C4` | Secondary text / small print (10.8:1 and 6.8:1) |
+| `cobalt` / `cobalt-bright` | `#1B36C9` / `#3A5BFF` | Brand blue; the source of every cool glow |
+| `volt` | `#8EA2FF` | Links and labels on night |
+| `spark` | `#FFC933` | The one warm accent: primary buttons, the spark mark, the hero spark |
 
 Fonts are self-hosted through Fontsource: Bricolage Grotesque (headings) and Atkinson Hyperlegible Next (body).
+
+### Surfaces, light and motion
+
+The building blocks live in the same file, under `@layer components`:
+
+- **Surfaces**: `.panel` (a group of things) and `.card` (one thing) are see-through with a hairline border lit from the top. `.glass` adds frosted blur, used only where light passes behind it (header, mobile menu).
+- **Light**: `.glow` plus `.glow-cobalt`, `.glow-deep` or `.glow-spark` is a soft pool of light; position and size it with Tailwind classes. `.sky` is the lit backdrop behind every page's header, and `.seam` draws a line of light along the top of a section.
+- **Buttons**: `.btn` with `.btn-spark` (primary), `.btn-light` (solid secondary) or `.btn-ghost` (glass outline); add `.btn-sm` for the compact size.
+- **Motion**: `.load-in` (with `style="--d: 120ms"` for a delay) plays once on page load. `data-reveal` fades an element up when it scrolls into view (stagger a group with `style="--i: 1"`, `--i: 2`, …). Add `data-spotlight` to a panel or card for the cursor-following light. `.drift-a`, `.drift-b`, `.float` and `.breathe` are slow ambient loops.
+
+Everything that moves is switched off for visitors who ask their system for reduced motion, and the hero diagram then shows a still picture. Pages also cross-fade into each other in browsers that support view transitions.
 
 ### Brand assets
 
@@ -119,9 +134,9 @@ Point the domain so that `www.mysolospark.com` redirects to `https://mysolospark
 ```
 src/
   config/site.ts        ← all editable content
-  styles/global.css     ← design tokens + base styles
+  styles/global.css     ← design tokens, surfaces, light and motion
   layouts/Base.astro    ← <head>, SEO tags, JSON-LD, header, footer
-  components/           ← Header, Footer, Logo, ContactForm, HeroDiagram, …
+  components/           ← Header, Footer, Logo, ContactForm, HeroDiagram, SparkOrb, ServiceGlyph, …
   pages/                ← one file per page (index, services, work, about, contact, privacy, 404)
 public/                 ← logo, favicons, og.png, images/
 .agents/product-marketing.md  ← positioning doc the copy is based on

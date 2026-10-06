@@ -1,7 +1,8 @@
 ---
 import { bookingHref, bookingIsExternal, site } from '../config/site';
 interface Props {
-  variant?: 'spark' | 'ink' | 'ghost';
+  /** spark: the primary call to action. light: solid secondary. ghost: glass outline. */
+  variant?: 'spark' | 'light' | 'ghost';
   class?: string;
   label?: string;
 }

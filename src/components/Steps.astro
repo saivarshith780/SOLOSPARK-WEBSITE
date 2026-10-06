@@ -1,31 +1,41 @@
 ---
 import { steps } from '../config/site';
 ---
-<ol class="steps relative grid gap-10 lg:grid-cols-4 lg:gap-8">
+<!-- data-inview: when the list scrolls into view, light runs along the wire and each step lights up in turn -->
+<ol class="steps relative grid gap-10 lg:grid-cols-4 lg:gap-8" data-inview>
   {steps.map((step, i) => (
-    <li class="step relative pl-16 lg:pl-0 lg:pt-16">
-      <span class="step-num absolute top-0 left-0 inline-flex h-11 w-11 items-center justify-center rounded-full border-2 border-ink bg-paper font-display text-step-1 font-bold">
-        {i + 1}
-      </span>
+    <li class="step relative pl-16 lg:pl-0 lg:pt-18" data-reveal style={`--i:${i}`}>
+      <span class:list={['num step-num absolute top-0 left-0', i === 0 && 'num-lit']}>{i + 1}</span>
       <h3 class="type-card">{step.title}</h3>
-      <p class="mt-2 text-slate">{step.body}</p>
+      <p class="mt-2.5 text-mist">{step.body}</p>
     </li>
   ))}
 </ol>
 
 <style>
-  /* The "wire" connecting each step */
-  .steps::before {
+  /* The wire between the steps, and the light that runs along it */
+  .steps::before,
+  .steps::after {
     content: '';
     position: absolute;
     left: 21px;
     top: 22px;
     bottom: 22px;
     width: 2px;
-    background: var(--color-line);
+    border-radius: 2px;
+  }
+  .steps::before {
+    background: var(--color-line-strong);
+  }
+  .steps::after {
+    background: linear-gradient(180deg, var(--color-spark), var(--color-volt) 35%, rgb(142 162 255 / 0.15));
+    box-shadow: 0 0 12px rgb(142 162 255 / 0.6);
+    transform-origin: top;
+    scale: 1 1;
   }
   @media (min-width: 64rem) {
-    .steps::before {
+    .steps::before,
+    .steps::after {
       left: 22px;
       right: 0;
       top: 21px;
@@ -33,9 +43,47 @@ import { steps } from '../config/site';
       width: auto;
       height: 2px;
     }
+    .steps::after {
+      background: linear-gradient(90deg, var(--color-spark), var(--color-volt) 35%, rgb(142 162 255 / 0.15));
+      transform-origin: left;
+    }
   }
-  .step:first-child .step-num {
-    background: var(--color-spark);
-    border-color: var(--color-spark);
+
+  .step-num:not(.num-lit) {
+    transition:
+      box-shadow 700ms var(--ease-out-quart),
+      color 700ms;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    :global(.js) .steps:not(:global(.is-in))::after {
+      scale: 0 1;
+    }
+    @media (max-width: 63.99rem) {
+      :global(.js) .steps:not(:global(.is-in))::after {
+        scale: 1 0;
+      }
+    }
+    .steps::after {
+      transition: scale 1.8s var(--ease-out-quart) 0.2s;
+    }
+  }
+
+  /* Each step's number picks up the light as it reaches it */
+  :global(.is-in) .step-num:not(.num-lit) {
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.2),
+      0 0 0 1px rgb(142 162 255 / 0.55),
+      0 0 0 6px var(--color-night),
+      0 0 24px 0 rgb(58 91 255 / 0.55);
+  }
+  .step:nth-child(2) .step-num {
+    transition-delay: 500ms;
+  }
+  .step:nth-child(3) .step-num {
+    transition-delay: 900ms;
+  }
+  .step:nth-child(4) .step-num {
+    transition-delay: 1300ms;
   }
 </style>

@@ -1,10 +1,12 @@
 ---
 // Email link that wraps neatly at the "@" on narrow screens.
+// `quiet` drops the underline until hover, for link lists like the footer.
 import { site } from '../config/site';
 interface Props {
   class?: string;
+  quiet?: boolean;
 }
-const { class: className = '' } = Astro.props;
+const { class: className = '', quiet = false } = Astro.props;
 const [user, domain] = site.contact.email.split('@');
 ---
-<a class:list={['link', className]} href={`mailto:${site.contact.email}`}>{user}<wbr />@{domain}</a>
+<a class:list={[quiet ? 'link-quiet' : 'link', className]} href={`mailto:${site.contact.email}`}>{user}<wbr />@{domain}</a>

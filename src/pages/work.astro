@@ -14,38 +14,43 @@ import { builds } from '../config/site';
   />
 
   {builds.map((b, i) => (
-    <article
-      id={b.slug}
-      class:list={['section-y scroll-mt-4 border-b border-line', i % 2 === 1 && 'bg-white']}
-      aria-labelledby={`${b.slug}-heading`}
-    >
-      <div class="page-x">
-        <p class="inline-block rounded-sm bg-ink px-3 py-1 text-step--1 font-bold text-white">{b.status}</p>
-        <h2 id={`${b.slug}-heading`} class="type-section mt-5 max-w-[22ch]">{b.name}</h2>
-        <p class="lede mt-5 text-slate">{b.summary}</p>
+    <article id={b.slug} class="section-y seam relative" aria-labelledby={`${b.slug}-heading`}>
+      <div
+        class:list={[
+          'glow glow-deep absolute top-40 h-[36rem] w-[48rem] opacity-60',
+          i % 2 === 0 ? '-right-56' : '-left-56',
+        ]}
+        aria-hidden="true"
+      ></div>
+      <div class="page-x relative">
+        <div data-reveal>
+          <p class:list={['tag', i === 0 && 'tag-spark']}>{b.status}</p>
+          <h2 id={`${b.slug}-heading`} class="type-section text-lit mt-6 max-w-[22ch]">{b.name}</h2>
+          <p class="lede mt-5">{b.summary}</p>
+        </div>
 
-        <div class="mt-12 grid gap-12 lg:grid-cols-2 lg:gap-16">
-          <div class="space-y-10">
+        <div class="mt-14 grid gap-12 lg:grid-cols-2 lg:gap-16">
+          <div class="space-y-10" data-reveal style="--i:1">
             <section>
               <h3 class="text-step-2">The problem</h3>
-              <p class="mt-3">{b.problem}</p>
+              <p class="mt-3 text-mist">{b.problem}</p>
             </section>
             <section>
               <h3 class="text-step-2">What I built</h3>
-              <p class="mt-3">{b.built}</p>
+              <p class="mt-3 text-mist">{b.built}</p>
             </section>
             {b.note && (
-              <p class="border-l-4 border-spark pl-4 text-slate">{b.note}</p>
+              <p class="note relative rounded-tile py-4 pr-5 pl-6 text-mist">{b.note}</p>
             )}
           </div>
 
-          <div class="space-y-10">
-            <section>
+          <div class="space-y-10" data-reveal style="--i:2">
+            <section class="panel p-6 sm:p-8" data-spotlight>
               <h3 class="text-step-2">How it works</h3>
-              <ol class="flow mt-5 space-y-5">
+              <ol class="flow mt-6 space-y-7">
                 {b.how.map((step, n) => (
-                  <li class="relative pl-12">
-                    <span class="absolute top-0 left-0 inline-flex h-8 w-8 items-center justify-center rounded-full bg-cobalt font-display font-bold text-white">{n + 1}</span>
+                  <li class="relative min-h-8 pt-0.5 pl-13">
+                    <span class:list={['num num-sm absolute top-0 left-0', n === 0 && 'num-lit']}>{n + 1}</span>
                     {step}
                   </li>
                 ))}
@@ -60,11 +65,11 @@ import { builds } from '../config/site';
             {b.alsoFits && (
               <section>
                 <h3 class="text-step-2">The same pattern fits</h3>
-                <p class="mt-3 text-slate">Research, score, personalize, send. Swap the inputs and it works for:</p>
+                <p class="mt-3 text-mist">Research, score, personalize, send. Swap the inputs and it works for:</p>
                 <ul class="mt-4 space-y-3">
                   {b.alsoFits.map((f) => (
                     <li class="flex gap-3">
-                      <span class="mt-2.5 h-2 w-2 flex-none rounded-full bg-cobalt" aria-hidden="true"></span>
+                      <span class="fit-dot mt-2.5 h-2 w-2 flex-none rounded-full" aria-hidden="true"></span>
                       {f}
                     </li>
                   ))}
@@ -81,13 +86,52 @@ import { builds } from '../config/site';
 </Base>
 
 <style>
+  /* The wire joining each step, lit at the start */
   .flow li:not(:last-child)::before {
     content: '';
     position: absolute;
     left: 15px;
-    top: 2.25rem;
-    bottom: -1rem;
+    top: 2.4rem;
+    bottom: -1.35rem;
     width: 2px;
-    background: var(--color-line);
+    border-radius: 2px;
+    background: linear-gradient(180deg, rgb(142 162 255 / 0.55), var(--color-line-strong));
+  }
+  .flow li:first-child::before {
+    background: linear-gradient(180deg, var(--color-spark), rgb(142 162 255 / 0.55));
+  }
+  /* Inside a panel the numbers don't need the night-colored gap ring */
+  .flow .num:not(.num-lit) {
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.18),
+      0 0 0 1px rgb(180 190 230 / 0.32);
+  }
+  .flow .num-lit {
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.6),
+      0 0 0 1px rgb(255 201 51 / 0.7),
+      0 0 22px 0 rgb(255 201 51 / 0.45);
+  }
+
+  /* A side note, edged in spark light */
+  .note {
+    background: rgb(255 201 51 / 0.05);
+    box-shadow: inset 0 0 0 1px rgb(255 201 51 / 0.14);
+  }
+  .note::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.85rem;
+    bottom: 0.85rem;
+    width: 3px;
+    border-radius: 3px;
+    background: var(--color-spark);
+    box-shadow: 0 0 14px rgb(255 201 51 / 0.7);
+  }
+
+  .fit-dot {
+    background: var(--color-volt);
+    box-shadow: 0 0 10px rgb(142 162 255 / 0.8);
   }
 </style>

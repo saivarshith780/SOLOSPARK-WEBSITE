@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import Base from '../layouts/Base.astro';
 import CtaBand from '../components/CtaBand.astro';
-import Spark from '../components/Spark.astro';
+import SparkOrb from '../components/SparkOrb.astro';
 import EmailLink from '../components/EmailLink.astro';
 import { site, tools } from '../config/site';
 
@@ -14,74 +14,74 @@ const hasHeadshot = fs.existsSync(path.join(process.cwd(), 'public', site.founde
   title="About Sai Varshith Chinthalapally | Solo Spark Founder"
   description="Meet Sai Varshith Chinthalapally, founder of Solo Spark: an AI automation engineer and n8n specialist with an MS in Data Science (NJIT), in Columbus, Ohio."
 >
-  <section class="border-b border-line">
-    <div class="page-x grid gap-12 pt-14 pb-14 md:grid-cols-[1fr_auto] md:items-end md:pt-20 md:pb-20">
+  <section class="relative">
+    <div class="page-x grid gap-12 pt-16 pb-16 md:grid-cols-[1fr_auto] md:items-center md:pt-24 md:pb-24">
       <div>
-        <h1 class="type-display max-w-[14ch]">Hi, I'm {site.founder.firstName}.</h1>
-        <p class="lede mt-6 text-slate">
+        <h1 class="type-display text-lit load-in max-w-[14ch]">Hi, I'm {site.founder.firstName}.</h1>
+        <p class="lede load-in mt-7" style="--d:120ms">
           I'm {site.founder.name}, {site.founder.title} of {site.legalName}. I build AI agents and automations
           for small and mid-sized businesses.
         </p>
       </div>
-      {hasHeadshot ? (
-        <img
-          src={site.founder.headshot}
-          alt={`${site.founder.name}, founder of Solo Spark`}
-          width="320"
-          height="320"
-          class="h-56 w-56 rounded-full object-cover md:h-72 md:w-72"
-        />
-      ) : (
-        <div
-          class="headshot-slot flex h-56 w-56 flex-col items-center justify-center gap-3 rounded-full bg-cobalt text-center md:h-72 md:w-72"
-          data-todo="Add headshot at public/images/sai.jpg"
-          aria-hidden="true"
-        >
-          <Spark class="h-16 w-16" />
-          <span class="px-8 text-step--1 text-mist">Photo coming soon</span>
-        </div>
-      )}
+      <div class="load-in" style="--d:200ms">
+        {hasHeadshot ? (
+          <div class="headshot relative h-56 w-56 rounded-full md:h-72 md:w-72">
+            <img
+              src={site.founder.headshot}
+              alt={`${site.founder.name}, founder of Solo Spark`}
+              width="320"
+              height="320"
+              class="h-full w-full rounded-full object-cover"
+            />
+          </div>
+        ) : (
+          <SparkOrb class="float h-56 w-56 md:h-72 md:w-72">
+            <span class="headshot-slot px-8 text-step--1 text-mist" data-todo="Add headshot at public/images/sai.jpg" aria-hidden="true">Photo coming soon</span>
+          </SparkOrb>
+        )}
+      </div>
     </div>
   </section>
 
-  <section class="section-y" aria-labelledby="story-heading">
-    <div class="page-x grid gap-12 lg:grid-cols-[1.4fr_1fr] lg:gap-20">
-      <div class="max-w-[38rem] space-y-5 text-step-1">
-        <h2 id="story-heading" class="type-section">Why I work this way</h2>
+  <section class="section-y seam relative" aria-labelledby="story-heading">
+    <div class="glow glow-deep absolute top-1/3 -right-48 h-[34rem] w-[44rem] opacity-60" aria-hidden="true"></div>
+    <div class="page-x relative grid gap-12 lg:grid-cols-[1.4fr_1fr] lg:gap-20">
+      <div class="max-w-[38rem] space-y-5 text-step-1" data-reveal>
+        <h2 id="story-heading" class="type-section text-lit">Why I work this way</h2>
         <p>
           I'm an AI automation engineer, and n8n is my specialty. I hold an {site.founder.education}. Most of my
           work is taking a process that people do by hand, step by step, and building a system that does those
           steps for them.
         </p>
-        <p>
+        <p class="text-mist">
           I work directly with the people who own that work: ops managers, office managers,
           COOs and owners. You explain how things get done today. I build something that fits it.
         </p>
-        <p>
+        <p class="text-mist">
           Solo Spark is founder-led on purpose. When you hire me, you work with the engineer who builds your
           system, from the first call to the hand-off. Questions reach the person who knows the answer.
         </p>
-        <p>
+        <p class="text-mist">
           I'm based in {site.location.city}, {site.location.region}. I work fully remote, with clients across the US.
         </p>
       </div>
 
-      <aside class="space-y-10 lg:pt-3" aria-label="Quick facts">
-        <div class="border-t-2 border-ink pt-5">
+      <aside class="facts panel self-start p-6 sm:p-8 lg:mt-2" aria-label="Quick facts" data-spotlight data-reveal style="--i:1">
+        <div class="fact">
           <h2 class="font-display text-step-1">What I build</h2>
-          <p class="mt-2 text-slate">Custom AI agents, workflow automations and LLM integrations.</p>
+          <p class="mt-2 text-mist">Custom AI agents, workflow automations and LLM integrations.</p>
         </div>
-        <div class="border-t-2 border-ink pt-5">
+        <div class="fact">
           <h2 class="font-display text-step-1">Education</h2>
-          <p class="mt-2 text-slate">{site.founder.education}</p>
+          <p class="mt-2 text-mist">{site.founder.education}</p>
         </div>
-        <div class="border-t-2 border-ink pt-5">
+        <div class="fact">
           <h2 class="font-display text-step-1">Tools</h2>
           <ul class="mt-3 flex flex-wrap gap-2">
             {tools.map((t) => <li class="chip">{t}</li>)}
           </ul>
         </div>
-        <div class="border-t-2 border-ink pt-5">
+        <div class="fact">
           <h2 class="font-display text-step-1">Reach me</h2>
           <ul class="mt-2 space-y-1">
             <li><EmailLink /></li>
@@ -94,3 +94,17 @@ const hasHeadshot = fs.existsSync(path.join(process.cwd(), 'public', site.founde
 
   <CtaBand heading="Let's talk about your team's week." />
 </Base>
+
+<style>
+  .fact + .fact {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--color-line);
+  }
+  .headshot {
+    box-shadow:
+      0 0 0 1px rgb(142 162 255 / 0.35),
+      0 0 0 8px rgb(142 162 255 / 0.06),
+      0 30px 80px -24px rgb(58 91 255 / 0.65);
+  }
+</style>

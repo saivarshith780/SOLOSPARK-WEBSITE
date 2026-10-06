@@ -3,6 +3,7 @@ import Base from '../layouts/Base.astro';
 import PageHero from '../components/PageHero.astro';
 import CtaBand from '../components/CtaBand.astro';
 import BookButton from '../components/BookButton.astro';
+import ServiceGlyph from '../components/ServiceGlyph.astro';
 import { services, site } from '../config/site';
 
 const serviceLd = services.map((s) => ({
@@ -25,40 +26,44 @@ const serviceLd = services.map((s) => ({
     title="What I build for ops teams"
     lede="Three kinds of systems, each built around the way your team already works. Pick the problem that costs you the most time and we start there."
   >
-    <nav aria-label="Services on this page" class="mt-8">
+    <nav aria-label="Services on this page" class="mt-9">
       <ul class="flex flex-wrap gap-3">
         {services.map((s) => (
-          <li><a class="btn btn-ghost min-h-11! py-2!" href={`#${s.slug}`}>{s.name}</a></li>
+          <li><a class="btn btn-ghost btn-sm" href={`#${s.slug}`}>{s.name}</a></li>
         ))}
       </ul>
     </nav>
   </PageHero>
 
   {services.map((s, i) => (
-    <section
-      id={s.slug}
-      class:list={['section-y scroll-mt-4 border-b border-line', i % 2 === 1 && 'bg-white']}
-      aria-labelledby={`${s.slug}-heading`}
-    >
-      <div class="page-x grid gap-10 lg:grid-cols-[1fr_1.3fr] lg:gap-16">
-        <div>
-          <h2 id={`${s.slug}-heading`} class="type-section">{s.name}</h2>
-          <p class="mt-5 text-step-1">{s.summary}</p>
-          <p class="mt-6 inline-block rounded-sm bg-spark px-3 py-1.5 font-bold text-ink">{s.outcome}</p>
-          <div class="mt-8">
+    <section id={s.slug} class="section-y seam relative" aria-labelledby={`${s.slug}-heading`}>
+      <div
+        class:list={[
+          'glow glow-deep absolute top-1/2 h-[34rem] w-[46rem] -translate-y-1/2 opacity-60',
+          i % 2 === 0 ? '-right-48' : '-left-48',
+        ]}
+        aria-hidden="true"
+      ></div>
+      <div class="page-x relative grid gap-12 lg:grid-cols-[1fr_1.3fr] lg:gap-16">
+        <div data-reveal>
+          <ServiceGlyph slug={s.slug} />
+          <h2 id={`${s.slug}-heading`} class="type-section text-lit mt-7">{s.name}</h2>
+          <p class="mt-5 text-step-1 text-mist">{s.summary}</p>
+          <p class="outcome mt-7 inline-flex rounded-pill px-4 py-1.5 font-bold text-night">{s.outcome}</p>
+          <div class="mt-9">
             <h3 class="font-display text-step-0 font-semibold">Tools I use for this</h3>
             <ul class="mt-3 flex flex-wrap gap-2">
               {s.tools.map((t) => <li class="chip">{t}</li>)}
             </ul>
           </div>
         </div>
-        <div>
+        <div data-reveal style="--i:1">
           <h3 class="font-display text-step-1">Examples for ops teams</h3>
-          <ul class="mt-4 border-t-2 border-ink">
+          <ul class="panel mt-5 px-6 sm:px-8" data-spotlight>
             {s.useCases.map((u) => (
-              <li class="border-b border-line py-6">
+              <li class="use-case py-6">
                 <h4 class="text-step-1">{u.title}</h4>
-                <p class="mt-2 text-slate">{u.body}</p>
+                <p class="mt-2 text-mist">{u.body}</p>
               </li>
             ))}
           </ul>
@@ -67,18 +72,31 @@ const serviceLd = services.map((s) => ({
     </section>
   ))}
 
-  <section class="section-y" aria-labelledby="unsure-heading">
+  <section class="section-y seam relative" aria-labelledby="unsure-heading">
     <div class="page-x">
-      <div class="max-w-[46rem]">
-      <h2 id="unsure-heading" class="type-section">Not sure which one you need?</h2>
-      <p class="mt-5 text-step-1 text-slate">
-        That's normal. Tell me what the work looks like today and I'll tell you which approach fits. Often it's a
-        mix: an automation that moves the data, with one AI step in the middle.
-      </p>
-      <div class="mt-8"><BookButton variant="ink" /></div>
+      <div class="max-w-[46rem]" data-reveal>
+        <h2 id="unsure-heading" class="type-section text-lit">Not sure which one you need?</h2>
+        <p class="mt-5 text-step-1 text-mist">
+          That's normal. Tell me what the work looks like today and I'll tell you which approach fits. Often it's a
+          mix: an automation that moves the data, with one AI step in the middle.
+        </p>
+        <div class="mt-9"><BookButton variant="light" /></div>
       </div>
     </div>
   </section>
 
   <CtaBand />
 </Base>
+
+<style>
+  .use-case + .use-case {
+    border-top: 1px solid var(--color-line);
+  }
+  /* The one result each service is for, in spark light */
+  .outcome {
+    background: linear-gradient(180deg, #ffd866, var(--color-spark));
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.55),
+      0 8px 26px -10px rgb(255 201 51 / 0.6);
+  }
+</style>

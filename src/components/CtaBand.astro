@@ -11,14 +11,62 @@ const {
   body = `Book a free ${site.call.length} intro call. You'll talk to me, the engineer who would build it, and you'll leave knowing whether automation makes sense for you.`,
 } = Astro.props;
 ---
-<section class="on-dark relative overflow-hidden bg-cobalt text-white" aria-labelledby="cta-heading">
-  <Spark class="pointer-events-none absolute right-12 -bottom-10 hidden h-80 w-80 lg:block" />
-  <div class="page-x section-y relative">
-    <h2 id="cta-heading" class="type-section max-w-[18ch]">{heading}</h2>
-    <p class="lede mt-5 text-mist">{body}</p>
-    <div class="mt-8 flex flex-wrap items-center gap-x-6 gap-y-4">
-      <BookButton />
-      <a class="link" href={`mailto:${site.contact.email}`}>Or email me</a>
+<section class="section-y relative" aria-labelledby="cta-heading">
+  <div class="page-x">
+    <div class="cta-panel panel overflow-hidden px-6 py-14 sm:px-12 md:px-16 md:py-20" data-reveal>
+      <!-- The spark is the light source for the whole panel -->
+      <div class="cta-grid" aria-hidden="true"></div>
+      <div class="glow glow-cobalt absolute -bottom-72 -left-40 h-[36rem] w-[60rem] opacity-90" aria-hidden="true"></div>
+      <div class="glow glow-spark breathe absolute -right-24 -bottom-40 h-[34rem] w-[34rem]" aria-hidden="true"></div>
+      <Spark class="cta-spark pointer-events-none absolute -right-4 -bottom-14 hidden h-80 w-80 lg:block" />
+
+      <div class="relative max-w-[40rem]">
+        <h2 id="cta-heading" class="type-section text-lit max-w-[18ch]">{heading}</h2>
+        <p class="lede mt-5">{body}</p>
+        <div class="mt-9 flex flex-wrap items-center gap-x-7 gap-y-4">
+          <BookButton />
+          <a class="link" href={`mailto:${site.contact.email}`}>Or email me</a>
+        </div>
+      </div>
     </div>
   </div>
 </section>
+
+<style>
+  .cta-panel {
+    background:
+      radial-gradient(120% 90% at 85% 110%, rgb(27 54 201 / 0.55), transparent 60%),
+      linear-gradient(180deg, rgb(160 175 255 / 0.07), rgb(160 175 255 / 0.02) 70%),
+      var(--color-night);
+  }
+  .cta-panel > :global(.glow) {
+    z-index: -2;
+  }
+  .cta-grid {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    background-image:
+      linear-gradient(rgb(142 162 255 / 0.08) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(142 162 255 / 0.08) 1px, transparent 1px);
+    background-size: 48px 48px;
+    -webkit-mask-image: radial-gradient(ellipse 60% 80% at 90% 100%, #000, transparent 70%);
+    mask-image: radial-gradient(ellipse 60% 80% at 90% 100%, #000, transparent 70%);
+  }
+  .cta-spark {
+    filter: drop-shadow(0 0 24px rgb(255 201 51 / 0.55)) drop-shadow(0 0 80px rgb(255 201 51 / 0.35));
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .cta-spark {
+      animation: cta-twinkle 7s var(--ease-in-out-sine) infinite alternate;
+    }
+  }
+  @keyframes cta-twinkle {
+    from {
+      transform: rotate(-4deg) scale(0.97);
+    }
+    to {
+      transform: rotate(4deg) scale(1.03);
+    }
+  }
+</style>

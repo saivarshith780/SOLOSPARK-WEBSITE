@@ -1,57 +1,323 @@
 ---
-// A small workflow graph: a request comes in, the agent handles it, work lands
-// where it belongs. One spark travels the wire (static under reduced motion).
+// A small workflow circuit: a request comes in, the agent handles it, and the
+// work lands where it belongs. On load the wires draw in, then a spark travels
+// the wire on a loop: it passes through the agent (which glows) and lights up
+// the tools it lands in. Unusual cases branch off to a person (dashed wire).
+// Under reduced motion it is a still picture with the destination lit.
 import { sparkPath } from '../lib/logo';
 const wire = 'M112 92 V150 Q112 170 132 170 H230 Q250 170 250 190 V258 Q250 278 270 278 H330 Q350 278 350 298 V318';
+const branch = 'M250 258 Q250 278 230 278 H132 Q112 278 112 298 V318';
 ---
-<figure class="hero-diagram relative w-full max-w-[30rem]" aria-labelledby="diagram-caption">
-  <svg viewBox="0 0 460 400" class="w-full overflow-visible" role="img" aria-labelledby="diagram-title">
-    <title id="diagram-title">A request comes in, an AI agent handles it, and the result lands in your tools. Unusual cases go to a person.</title>
-    <g fill="none" stroke="var(--color-mist)" stroke-width="2.5" stroke-linecap="round" opacity="0.7">
-      <path d={wire}></path>
-      <path d="M250 258 Q250 278 230 278 H132 Q112 278 112 298 V318"></path>
-    </g>
+<figure class="hero-diagram relative w-full max-w-[33rem]" aria-labelledby="diagram-caption">
+  <!-- Light cast by the circuit onto the page behind it -->
+  <div class="glow glow-cobalt absolute -inset-x-16 -inset-y-20 opacity-90" aria-hidden="true"></div>
+  <div class="glow glow-spark agent-light absolute top-[38%] left-[22%] h-[55%] w-[60%]" aria-hidden="true"></div>
 
-    <g font-family="var(--font-sans)" font-size="18">
-      <rect x="0" y="30" width="250" height="62" rx="10" fill="var(--color-white)"></rect>
-      <text x="18" y="67" fill="var(--color-ink)" font-weight="700">New form, email or call</text>
+  <div class="diagram-panel panel float p-3 sm:p-6 lg:p-7">
+    <svg viewBox="-6 22 472 366" class="block w-full overflow-visible" role="img" aria-labelledby="diagram-title">
+      <title id="diagram-title">A request comes in, an AI agent handles it, and the result lands in your tools. Unusual cases go to a person.</title>
+      <defs>
+        <linearGradient id="hd-fill" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#ffffff" stop-opacity="0.12"></stop>
+          <stop offset="1" stop-color="#ffffff" stop-opacity="0.035"></stop>
+        </linearGradient>
+        <linearGradient id="hd-edge" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#dbe2ff" stop-opacity="0.55"></stop>
+          <stop offset="1" stop-color="#dbe2ff" stop-opacity="0.1"></stop>
+        </linearGradient>
+        <linearGradient id="hd-agent" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#22307f"></stop>
+          <stop offset="1" stop-color="#0c1340"></stop>
+        </linearGradient>
+        <radialGradient id="hd-halo">
+          <stop offset="0" stop-color="#ffc933" stop-opacity="0.6"></stop>
+          <stop offset="0.4" stop-color="#ffc933" stop-opacity="0.18"></stop>
+          <stop offset="1" stop-color="#ffc933" stop-opacity="0"></stop>
+        </radialGradient>
+        <filter id="hd-glow" x="-20%" y="-20%" width="140%" height="140%">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="3.5" result="blur"></feGaussianBlur>
+          <feMerge>
+            <feMergeNode in="blur"></feMergeNode>
+            <feMergeNode in="SourceGraphic"></feMergeNode>
+          </feMerge>
+        </filter>
+      </defs>
 
-      <rect x="130" y="190" width="240" height="48" rx="24" fill="var(--color-ink)"></rect>
-      <path transform="translate(148 202)" fill="var(--color-spark)" d={sparkPath}></path>
-      <text x="182" y="220" fill="var(--color-white)" font-weight="700">AI agent handles it</text>
+      <!-- Wires -->
+      <path class="wire" d={wire} pathLength="100"></path>
+      <path class="wire-branch" d={branch}></path>
 
-      <rect x="0" y="318" width="230" height="62" rx="10" fill="var(--color-white)" fill-opacity="0.12" stroke="var(--color-mist)" stroke-width="1.5"></rect>
-      <text x="18" y="355" fill="var(--color-white)">Odd ones go to a person</text>
+      <!-- The spark and its trail run under the nodes, so it disappears into the agent -->
+      <path class="trail" d={wire} pathLength="100" filter="url(#hd-glow)"></path>
+      <g class="traveller" style={`offset-path: path('${wire}');`}>
+        <circle r="15" fill="url(#hd-halo)"></circle>
+        <circle r="4.5" fill="#fff6d6"></circle>
+        <circle r="4.5" fill="none" stroke="#ffc933" stroke-width="1.6"></circle>
+      </g>
 
-      <rect x="244" y="318" width="216" height="62" rx="10" fill="var(--color-white)"></rect>
-      <text x="262" y="355" fill="var(--color-ink)" font-weight="700">Logged in your tools</text>
-    </g>
+      <!-- Nodes -->
+      <g class="node node-in">
+        <rect x="0" y="30" width="250" height="62" rx="14" class="node-box"></rect>
+        <text x="18" y="67" class="node-label">New form, email or call</text>
+      </g>
 
-    <g class="traveller" style={`offset-path: path('${wire}');`}>
-      <circle r="11" fill="var(--color-spark)" opacity="0.3"></circle>
-      <circle r="5" fill="var(--color-spark)"></circle>
-    </g>
-  </svg>
+      <g class="node node-agent">
+        <circle cx="250" cy="214" r="74" fill="url(#hd-halo)" class="agent-halo"></circle>
+        <rect x="130" y="190" width="240" height="48" rx="24" fill="url(#hd-agent)" class="agent-box"></rect>
+        <path transform="translate(148 202)" d={sparkPath} class="agent-spark"></path>
+        <text x="182" y="220" class="node-label">AI agent handles it</text>
+      </g>
+
+      <g class="node node-person">
+        <rect x="0" y="318" width="230" height="62" rx="14" class="node-box node-box-quiet"></rect>
+        <text x="18" y="355" class="node-label node-label-quiet">Odd ones go to a person</text>
+      </g>
+
+      <g class="node node-tools">
+        <rect x="244" y="318" width="216" height="62" rx="14" class="node-box"></rect>
+        <rect x="244" y="318" width="216" height="62" rx="14" class="tools-lit" filter="url(#hd-glow)"></rect>
+        <text x="262" y="355" class="node-label">Logged in your tools</text>
+      </g>
+    </svg>
+  </div>
   <figcaption id="diagram-caption" class="sr-only">How an automation I build handles a routine request.</figcaption>
 </figure>
 
 <style>
+  /* No backdrop blur here on purpose: the panel floats, and re-blurring the
+     page behind it every frame would cost more than it shows. */
+  .diagram-panel {
+    --radius-panel: 1.6rem;
+    background: linear-gradient(180deg, rgb(160 175 255 / 0.08), rgb(10 15 42 / 0.55) 70%);
+  }
+
+  /* ---- Still picture (also the reduced-motion state) ---- */
+  .wire {
+    fill: none;
+    stroke: rgb(180 192 240 / 0.32);
+    stroke-width: 2;
+    stroke-linecap: round;
+  }
+  .wire-branch {
+    fill: none;
+    stroke: rgb(180 192 240 / 0.3);
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-dasharray: 2 7;
+  }
+  .node-box {
+    fill: url(#hd-fill);
+    stroke: url(#hd-edge);
+    stroke-width: 1.25;
+  }
+  .node-box-quiet {
+    fill: rgb(255 255 255 / 0.025);
+    stroke: rgb(180 192 240 / 0.24);
+  }
+  .node-label {
+    font-family: var(--font-sans);
+    font-size: 18px;
+    font-weight: 700;
+    fill: var(--color-snow);
+  }
+  .node-label-quiet {
+    font-weight: 400;
+    fill: var(--color-mist);
+  }
+  .agent-box {
+    stroke: rgb(255 201 51 / 0.6);
+    stroke-width: 1.25;
+  }
+  .agent-spark {
+    fill: var(--color-spark);
+  }
+  .agent-halo {
+    opacity: 0.55;
+  }
+  .tools-lit {
+    fill: rgb(255 201 51 / 0.06);
+    stroke: rgb(255 201 51 / 0.85);
+    stroke-width: 1.5;
+    opacity: 1;
+  }
+  .trail {
+    fill: none;
+    stroke: var(--color-spark);
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-dasharray: 16 300;
+    stroke-dashoffset: -100;
+    opacity: 0;
+  }
   .traveller {
     offset-rotate: 0deg;
     offset-distance: 100%;
-    animation: travel 2.6s cubic-bezier(0.45, 0, 0.25, 1) 0.6s 1 both;
   }
-  @keyframes travel {
+  .agent-light {
+    opacity: 0.8;
+  }
+
+  /* ---- Motion ---- */
+  @media (prefers-reduced-motion: no-preference) {
+    /* Load: the wires draw in, then the nodes arrive in reading order */
+    .wire {
+      stroke-dasharray: 100;
+      animation: hd-draw 1.5s var(--ease-out-quart) 0.6s backwards;
+    }
+    .wire-branch {
+      animation: hd-fade 0.8s ease 1.5s backwards;
+    }
+    .node {
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: hd-node 1s var(--ease-out-expo) backwards;
+    }
+    .node-in {
+      animation-delay: 0.45s;
+    }
+    .node-agent {
+      animation-delay: 0.85s;
+    }
+    .node-person {
+      animation-delay: 1.2s;
+    }
+    .node-tools {
+      animation-delay: 1.3s;
+    }
+
+    /* Loop: one spark every 6.5s. Every piece shares the same clock. */
+    .traveller,
+    .trail,
+    .agent-halo,
+    .tools-lit,
+    .agent-light {
+      animation-duration: 6.5s;
+      animation-delay: 2.1s;
+      animation-iteration-count: infinite;
+      animation-timing-function: linear;
+      animation-fill-mode: both;
+    }
+    .traveller {
+      animation-name: hd-travel;
+    }
+    .trail {
+      animation-name: hd-trail;
+    }
+    .agent-halo {
+      animation-name: hd-agent;
+    }
+    .agent-light {
+      animation-name: hd-agent-light;
+    }
+    .tools-lit {
+      animation-name: hd-tools;
+    }
+  }
+  /* Browsers without motion paths keep the still picture */
+  @supports not (offset-path: path('M0 0')) {
+    .traveller,
+    .trail {
+      animation: none !important;
+      display: none;
+    }
+  }
+
+  @keyframes hd-draw {
     from {
-      offset-distance: 0%;
+      stroke-dashoffset: 100;
     }
     to {
-      offset-distance: 100%;
+      stroke-dashoffset: 0;
     }
   }
-  @media (prefers-reduced-motion: reduce) {
-    .traveller {
-      animation: none;
+  @keyframes hd-fade {
+    from {
+      opacity: 0;
+    }
+  }
+  @keyframes hd-node {
+    from {
+      opacity: 0;
+      transform: translateY(10px) scale(0.97);
+    }
+  }
+  /* The spark covers the wire in the first 46% of the loop, at constant speed. */
+  @keyframes hd-travel {
+    0% {
+      offset-distance: 0%;
+      opacity: 0;
+    }
+    4% {
+      opacity: 1;
+    }
+    46% {
+      offset-distance: 100%;
+      opacity: 1;
+    }
+    54%,
+    100% {
+      offset-distance: 100%;
+      opacity: 0;
+    }
+  }
+  /* Dash offset = trail length - spark position, so the trail sticks to the spark */
+  @keyframes hd-trail {
+    0% {
+      stroke-dashoffset: 16;
+      opacity: 0;
+    }
+    4% {
+      opacity: 0.85;
+    }
+    46% {
+      stroke-dashoffset: -84;
+      opacity: 0.85;
+    }
+    53%,
+    100% {
+      stroke-dashoffset: -100;
+      opacity: 0;
+    }
+  }
+  /* The spark is inside the agent between about 23% and 29% of the loop */
+  @keyframes hd-agent {
+    0%,
+    19% {
+      opacity: 0.45;
+    }
+    26% {
+      opacity: 1;
+    }
+    40%,
+    100% {
+      opacity: 0.45;
+    }
+  }
+  @keyframes hd-agent-light {
+    0%,
+    19% {
+      opacity: 0.55;
+    }
+    27% {
+      opacity: 1;
+    }
+    42%,
+    100% {
+      opacity: 0.55;
+    }
+  }
+  /* ...and lands in your tools at 46% */
+  @keyframes hd-tools {
+    0%,
+    44% {
+      opacity: 0;
+    }
+    49% {
+      opacity: 1;
+    }
+    80%,
+    100% {
+      opacity: 0;
     }
   }
 </style>

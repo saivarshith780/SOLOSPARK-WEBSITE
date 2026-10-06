@@ -1,6 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
-import Spark from '../components/Spark.astro';
+import SparkOrb from '../components/SparkOrb.astro';
 import { nav } from '../config/site';
 ---
 <Base
@@ -11,16 +11,16 @@ import { nav } from '../config/site';
 >
   <section class="section-y">
     <div class="page-x">
-      <div class="flex items-center gap-4">
-        <Spark class="h-10 w-10" color="var(--color-cobalt)" />
-        <p class="font-display text-step-1 font-bold text-cobalt">Error 404</p>
+      <div class="load-in flex items-center gap-4">
+        <SparkOrb class="h-12 w-12" />
+        <p class="font-display text-step-1 font-bold text-volt">Error 404</p>
       </div>
-      <h1 class="type-display mt-6 max-w-[14ch]">This wire doesn't connect to anything.</h1>
-      <p class="lede mt-6 text-slate">The page you're looking for isn't here. It may have moved, or the link may be mistyped.</p>
-      <div class="mt-9 flex flex-wrap gap-4">
-        <a class="btn btn-ink" href="/">Go to the home page</a>
+      <h1 class="type-display text-lit load-in mt-8 max-w-[14ch]" style="--d:100ms">This wire doesn't connect to anything.</h1>
+      <p class="lede load-in mt-7" style="--d:180ms">The page you're looking for isn't here. It may have moved, or the link may be mistyped.</p>
+      <div class="load-in mt-10 flex flex-wrap gap-4" style="--d:260ms">
+        <a class="btn btn-light" href="/">Go to the home page</a>
       </div>
-      <nav aria-label="Site sections" class="mt-12">
+      <nav aria-label="Site sections" class="load-in mt-12" style="--d:340ms">
         <ul class="flex flex-wrap gap-x-6 gap-y-3">
           {nav.map((n) => <li><a class="link" href={n.href}>{n.label}</a></li>)}
         </ul>
