@@ -1,0 +1,24 @@
+---
+import { site } from '../config/site';
+import BookButton from './BookButton.astro';
+import Spark from './Spark.astro';
+interface Props {
+  heading?: string;
+  body?: string;
+}
+const {
+  heading = "Tell me about the work you'd hand off first.",
+  body = `Book a free ${site.call.length} intro call. You'll talk to me, the engineer who would build it, and you'll leave knowing whether automation makes sense for you.`,
+} = Astro.props;
+---
+<section class="on-dark relative overflow-hidden bg-cobalt text-white" aria-labelledby="cta-heading">
+  <Spark class="pointer-events-none absolute -right-16 -bottom-20 h-72 w-72 opacity-90 md:right-12 md:-bottom-10 md:h-80 md:w-80" />
+  <div class="page-x section-y relative">
+    <h2 id="cta-heading" class="h-section max-w-[18ch]">{heading}</h2>
+    <p class="lede mt-5 text-mist">{body}</p>
+    <div class="mt-8 flex flex-wrap items-center gap-x-6 gap-y-4">
+      <BookButton />
+      <a class="link" href={`mailto:${site.contact.email}`}>Or email me</a>
+    </div>
+  </div>
+</section>

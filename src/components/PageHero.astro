@@ -1,0 +1,14 @@
+---
+interface Props {
+  title: string;
+  lede?: string;
+}
+const { title, lede } = Astro.props;
+---
+<section class="border-b border-line">
+  <div class="page-x pt-14 pb-12 md:pt-20 md:pb-16">
+    <h1 class="h-display max-w-[16ch]">{title}</h1>
+    {lede && <p class="lede mt-6 text-slate">{lede}</p>}
+    <slot />
+  </div>
+</section>

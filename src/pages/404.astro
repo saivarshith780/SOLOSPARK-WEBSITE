@@ -1,0 +1,30 @@
+---
+import Base from '../layouts/Base.astro';
+import Spark from '../components/Spark.astro';
+import { nav } from '../config/site';
+---
+<Base
+  title="Page not found | Solo Spark"
+  description="This page doesn't exist on mysolospark.com. Head back to the home page or pick a section below."
+  path="/404"
+  noindex
+>
+  <section class="section-y">
+    <div class="page-x">
+      <div class="flex items-center gap-4">
+        <Spark class="h-10 w-10" color="var(--color-cobalt)" />
+        <p class="font-display text-step-1 font-bold text-cobalt">Error 404</p>
+      </div>
+      <h1 class="h-display mt-6 max-w-[14ch]">This wire doesn't connect to anything.</h1>
+      <p class="lede mt-6 text-slate">The page you're looking for isn't here. It may have moved, or the link may be mistyped.</p>
+      <div class="mt-9 flex flex-wrap gap-4">
+        <a class="btn btn-ink" href="/">Go to the home page</a>
+      </div>
+      <nav aria-label="Site sections" class="mt-12">
+        <ul class="flex flex-wrap gap-x-6 gap-y-3">
+          {nav.map((n) => <li><a class="link" href={n.href}>{n.label}</a></li>)}
+        </ul>
+      </nav>
+    </div>
+  </section>
+</Base>

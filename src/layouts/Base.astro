@@ -1,0 +1,107 @@
+---
+import '../styles/global.css';
+import { site } from '../config/site';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  /** Path for the canonical URL, e.g. "/services". Defaults to the current path. */
+  path?: string;
+  noindex?: boolean;
+  jsonLd?: Record<string, unknown>[];
+}
+
+const { title, description, path, noindex = false, jsonLd = [] } = Astro.props;
+const cleanPath = (path ?? Astro.url.pathname).replace(/\.html$/, '').replace(/\/$/, '') || '/';
+const canonical = new URL(cleanPath === '/' ? '/' : cleanPath, site.url).href;
+const ogImage = new URL('/og.png', site.url).href;
+
+const business = {
+  '@context': 'https://schema.org',
+  '@type': 'ProfessionalService',
+  '@id': `${site.url}/#business`,
+  name: site.legalName,
+  alternateName: site.name,
+  url: site.url,
+  logo: `${site.url}/logo.svg`,
+  image: ogImage,
+  description: site.description,
+  email: site.contact.email,
+  telephone: site.contact.phoneHref.replace('tel:', ''),
+  address: {
+    '@type': 'PostalAddress',
+    addressLocality: site.location.city,
+    addressRegion: site.location.regionCode,
+    addressCountry: site.location.country,
+  },
+  areaServed: { '@type': 'Country', name: site.location.areaServed },
+  founder: { '@id': `${site.url}/#founder` },
+  knowsAbout: ['AI agents', 'Workflow automation', 'LLM integration', 'n8n'],
+  sameAs: Object.values(site.social).filter(Boolean),
+};
+const founder = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  '@id': `${site.url}/#founder`,
+  name: site.founder.name,
+  jobTitle: site.founder.title,
+  worksFor: { '@id': `${site.url}/#business` },
+  alumniOf: { '@type': 'CollegeOrUniversity', name: 'New Jersey Institute of Technology' },
+  url: `${site.url}/about`,
+  sameAs: Object.values(site.social).filter(Boolean),
+};
+const website = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  '@id': `${site.url}/#website`,
+  name: site.name,
+  url: site.url,
+  publisher: { '@id': `${site.url}/#business` },
+};
+const schemas = [business, founder, website, ...jsonLd];
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex, follow" />}
+
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <meta name="theme-color" content="#1B36C9" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:locale" content={site.locale} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Solo Spark: AI agents and automations for small and mid-sized ops teams" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+
+    {schemas.map((s) => <script type="application/ld+json" set:html={JSON.stringify(s)} />)}
+  </head>
+  <body class="flex min-h-dvh flex-col">
+    <a href="#main" class="sr-only z-50 rounded-sm bg-ink px-4 py-3 text-white focus:not-sr-only focus:fixed focus:top-3 focus:left-3">Skip to content</a>
+    <Header />
+    <main id="main" class="flex-1">
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>

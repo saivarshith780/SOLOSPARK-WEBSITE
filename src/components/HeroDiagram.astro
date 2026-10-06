@@ -1,0 +1,57 @@
+---
+// A small workflow graph: a request comes in, the agent handles it, work lands
+// where it belongs. One spark travels the wire (static under reduced motion).
+import { sparkPath } from '../lib/logo';
+const wire = 'M130 92 V150 Q130 170 150 170 H240 Q260 170 260 190 V236 Q260 256 280 256 H330 Q350 256 350 276 V318';
+---
+<figure class="hero-diagram relative w-full max-w-[30rem]" aria-labelledby="diagram-caption">
+  <svg viewBox="0 0 480 400" class="w-full overflow-visible" role="img" aria-labelledby="diagram-title">
+    <title id="diagram-title">A request comes in, an AI agent handles it, and the result lands in your tools. Unusual cases go to a person.</title>
+    <g fill="none" stroke="var(--color-mist)" stroke-width="2.5" stroke-linecap="round" opacity="0.7">
+      <path d={wire}></path>
+      <path d="M260 236 V256 Q260 276 240 276 H150 Q130 276 130 296 V318"></path>
+    </g>
+
+    <g font-family="var(--font-sans)" font-size="17">
+      <rect x="20" y="32" width="220" height="60" rx="10" fill="var(--color-white)"></rect>
+      <text x="40" y="68" fill="var(--color-ink)" font-weight="700">New form, email or call</text>
+
+      <rect x="150" y="190" width="220" height="46" rx="23" fill="var(--color-ink)"></rect>
+      <path transform="translate(168 201) scale(1)" fill="var(--color-spark)" d={sparkPath}></path>
+      <text x="200" y="219" fill="var(--color-white)" font-weight="700">AI agent handles it</text>
+
+      <rect x="20" y="318" width="210" height="60" rx="10" fill="var(--color-white)" fill-opacity="0.12" stroke="var(--color-mist)" stroke-width="1.5"></rect>
+      <text x="40" y="354" fill="var(--color-white)">Odd ones go to a person</text>
+
+      <rect x="250" y="318" width="210" height="60" rx="10" fill="var(--color-white)"></rect>
+      <text x="270" y="354" fill="var(--color-ink)" font-weight="700">Logged in your tools</text>
+    </g>
+
+    <g class="traveller" style={`offset-path: path('${wire}');`}>
+      <circle r="11" fill="var(--color-spark)" opacity="0.3"></circle>
+      <circle r="5" fill="var(--color-spark)"></circle>
+    </g>
+  </svg>
+  <figcaption id="diagram-caption" class="sr-only">How an automation I build handles a routine request.</figcaption>
+</figure>
+
+<style>
+  .traveller {
+    offset-rotate: 0deg;
+    offset-distance: 100%;
+    animation: travel 2.6s cubic-bezier(0.45, 0, 0.25, 1) 0.6s 1 both;
+  }
+  @keyframes travel {
+    from {
+      offset-distance: 0%;
+    }
+    to {
+      offset-distance: 100%;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .traveller {
+      animation: none;
+    }
+  }
+</style>

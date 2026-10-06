@@ -1,0 +1,222 @@
+---
+import { site } from '../config/site';
+const fields: { id: string; label: string; type: 'text' | 'email'; autocomplete: 'name' | 'email' | 'organization'; required: boolean }[] = [
+  { id: 'name', label: 'Your name', type: 'text', autocomplete: 'name', required: true },
+  { id: 'email', label: 'Work email', type: 'email', autocomplete: 'email', required: true },
+  { id: 'company', label: 'Company', type: 'text', autocomplete: 'organization', required: false },
+];
+---
+<form
+  id="contact-form"
+  class="contact-form"
+  action="https://api.web3forms.com/submit"
+  method="POST"
+  novalidate
+  data-key={site.web3formsKey}
+>
+  <input type="hidden" name="access_key" value={site.web3formsKey} />
+  <input type="hidden" name="subject" value="New inquiry from mysolospark.com" />
+  <input type="hidden" name="from_name" value="Solo Spark website" />
+
+  <!-- Honeypot: hidden from people, bots fill it in. -->
+  <div class="hp" aria-hidden="true">
+    <label for="botcheck">Leave this field empty</label>
+    <input type="text" id="botcheck" name="botcheck" tabindex="-1" autocomplete="off" />
+  </div>
+
+  <div class="grid gap-6 sm:grid-cols-2">
+    {fields.map((f) => (
+      <div class:list={['field', f.id === 'company' && 'sm:col-span-2']}>
+        <label for={f.id} class="block font-bold">
+          {f.label}
+          {!f.required && <span class="font-normal text-slate"> (optional)</span>}
+        </label>
+        <input
+          id={f.id}
+          name={f.id}
+          type={f.type}
+          autocomplete={f.autocomplete}
+          required={f.required}
+          aria-describedby={`${f.id}-error`}
+          class="input mt-2"
+        />
+        <p id={`${f.id}-error`} class="error mt-2 text-step--1 font-bold text-danger" hidden></p>
+      </div>
+    ))}
+    <div class="field sm:col-span-2">
+      <label for="message" class="block font-bold">What do you want to automate?</label>
+      <p id="message-hint" class="mt-1 text-step--1 text-slate">A few sentences is plenty. What happens today, and what you'd like to stop doing by hand.</p>
+      <textarea
+        id="message"
+        name="message"
+        rows="6"
+        required
+        aria-describedby="message-hint message-error"
+        class="input mt-2"
+      ></textarea>
+      <p id="message-error" class="error mt-2 text-step--1 font-bold text-danger" hidden></p>
+    </div>
+  </div>
+
+  <div class="mt-8 flex flex-wrap items-center gap-5">
+    <button type="submit" class="btn btn-ink submit-btn">
+      <span class="spinner" aria-hidden="true"></span>
+      <span class="submit-label">Send message</span>
+    </button>
+    <p class="text-step--1 text-slate">It goes straight to my inbox.</p>
+  </div>
+
+  <div class="status mt-6" role="status" aria-live="polite" tabindex="-1">
+    <div class="status-success rounded-sm border-2 border-success bg-white p-5" hidden>
+      <p class="font-display text-step-1 font-bold">Thanks, your message is on its way.</p>
+      <p class="mt-1 text-slate">I'll read it and reply to the email you gave me.</p>
+    </div>
+    <div class="status-error rounded-sm border-2 border-danger bg-white p-5" hidden>
+      <p class="font-display text-step-1 font-bold">Your message didn't send.</p>
+      <p class="mt-1 text-slate">
+        Please try again, or email me directly at
+        <a class="link break-all" href={`mailto:${site.contact.email}`}>{site.contact.email}</a>.
+      </p>
+    </div>
+  </div>
+</form>
+
+<style>
+  .hp {
+    position: absolute;
+    left: -10000px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+  .input {
+    display: block;
+    width: 100%;
+    min-height: 3rem;
+    padding: 0.7rem 0.9rem;
+    border: 2px solid var(--color-slate);
+    border-radius: var(--radius-sm);
+    background: var(--color-white);
+    color: var(--color-ink);
+    font: inherit;
+  }
+  .input:focus-visible {
+    outline: 3px solid var(--color-cobalt);
+    outline-offset: 1px;
+    border-color: var(--color-cobalt);
+  }
+  .input[aria-invalid='true'] {
+    border-color: var(--color-danger);
+  }
+  textarea.input {
+    resize: vertical;
+  }
+  .spinner {
+    display: none;
+    width: 1rem;
+    height: 1rem;
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: spin 700ms linear infinite;
+  }
+  .contact-form[data-state='loading'] .spinner {
+    display: inline-block;
+  }
+  .contact-form[data-state='loading'] .submit-btn {
+    opacity: 0.8;
+    cursor: progress;
+  }
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+</style>
+
+<script>
+  const form = document.querySelector<HTMLFormElement>('#contact-form');
+
+  type FieldName = 'name' | 'email' | 'message';
+  const rules: Record<FieldName, (v: string) => string> = {
+    name: (v) => (v.trim() ? '' : 'Please enter your name.'),
+    email: (v) =>
+      !v.trim()
+        ? 'Please enter your email.'
+        : /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim())
+          ? ''
+          : 'Please enter a valid email, like you@company.com.',
+    message: (v) =>
+      v.trim().length >= 10 ? '' : 'Please add a sentence or two about what you want to automate.',
+  };
+
+  if (form) {
+    const label = form.querySelector<HTMLElement>('.submit-label')!;
+    const btn = form.querySelector<HTMLButtonElement>('.submit-btn')!;
+    const status = form.querySelector<HTMLElement>('.status')!;
+    const ok = form.querySelector<HTMLElement>('.status-success')!;
+    const fail = form.querySelector<HTMLElement>('.status-error')!;
+
+    const field = (n: FieldName) => form.elements.namedItem(n) as HTMLInputElement | HTMLTextAreaElement;
+
+    const check = (n: FieldName) => {
+      const el = field(n);
+      const msg = rules[n](el.value);
+      const err = document.getElementById(`${n}-error`)!;
+      err.textContent = msg;
+      err.hidden = !msg;
+      if (msg) el.setAttribute('aria-invalid', 'true');
+      else el.removeAttribute('aria-invalid');
+      return !msg;
+    };
+
+    (Object.keys(rules) as FieldName[]).forEach((n) => {
+      const el = field(n);
+      el.addEventListener('blur', () => el.value && check(n));
+      el.addEventListener('input', () => el.hasAttribute('aria-invalid') && check(n));
+    });
+
+    const setState = (state: 'idle' | 'loading' | 'success' | 'error') => {
+      form.dataset.state = state;
+      btn.disabled = state === 'loading';
+      label.textContent = state === 'loading' ? 'Sending…' : 'Send message';
+      ok.hidden = state !== 'success';
+      fail.hidden = state !== 'error';
+      if (state === 'success' || state === 'error') status.focus();
+    };
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const invalid = (Object.keys(rules) as FieldName[]).filter((n) => !check(n));
+      if (invalid.length) {
+        field(invalid[0]).focus();
+        return;
+      }
+
+      // Honeypot filled in: act as if it worked, send nothing.
+      const trap = form.elements.namedItem('botcheck') as HTMLInputElement;
+      if (trap.value) {
+        setState('success');
+        form.reset();
+        return;
+      }
+
+      setState('loading');
+      try {
+        const data = Object.fromEntries(new FormData(form));
+        delete (data as Record<string, unknown>).botcheck;
+        const res = await fetch(form.action, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify({ ...data, replyto: data.email }),
+        });
+        const json = await res.json().catch(() => ({}));
+        if (!res.ok || !json.success) throw new Error(json.message || `HTTP ${res.status}`);
+        form.reset();
+        setState('success');
+      } catch {
+        setState('error');
+      }
+    });
+  }
+</script>

@@ -1,0 +1,82 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import CtaBand from '../components/CtaBand.astro';
+import BookButton from '../components/BookButton.astro';
+import { services, site } from '../config/site';
+
+const serviceLd = services.map((s) => ({
+  '@context': 'https://schema.org',
+  '@type': 'Service',
+  name: s.name,
+  description: s.summary,
+  serviceType: s.name,
+  url: `${site.url}/services#${s.slug}`,
+  provider: { '@id': `${site.url}/#business` },
+  areaServed: { '@type': 'Country', name: site.location.areaServed },
+}));
+---
+<Base
+  title="Services: AI Agents, Workflow Automation & LLM Integrations | Solo Spark"
+  description="AI agents, n8n workflow automation and LLM integrations for ops teams: lead routing, invoice processing, support triage, reporting, reminders and AI phone agents."
+  jsonLd={serviceLd}
+>
+  <PageHero
+    title="What I build for ops teams"
+    lede="Three kinds of systems, each built around the way your team already works. Pick the problem that costs you the most time and we start there."
+  >
+    <nav aria-label="Services on this page" class="mt-8">
+      <ul class="flex flex-wrap gap-3">
+        {services.map((s) => (
+          <li><a class="btn btn-ghost min-h-11! py-2!" href={`#${s.slug}`}>{s.name}</a></li>
+        ))}
+      </ul>
+    </nav>
+  </PageHero>
+
+  {services.map((s, i) => (
+    <section
+      id={s.slug}
+      class:list={['section-y scroll-mt-4 border-b border-line', i % 2 === 1 && 'bg-white']}
+      aria-labelledby={`${s.slug}-heading`}
+    >
+      <div class="page-x grid gap-10 lg:grid-cols-[1fr_1.3fr] lg:gap-16">
+        <div>
+          <h2 id={`${s.slug}-heading`} class="h-section">{s.name}</h2>
+          <p class="mt-5 text-step-1">{s.summary}</p>
+          <p class="mt-6 inline-block rounded-sm bg-spark px-3 py-1.5 font-bold text-ink">{s.outcome}</p>
+          <div class="mt-8">
+            <h3 class="font-display text-step-0 font-semibold">Tools I use for this</h3>
+            <ul class="mt-3 flex flex-wrap gap-2">
+              {s.tools.map((t) => <li class="chip">{t}</li>)}
+            </ul>
+          </div>
+        </div>
+        <div>
+          <h3 class="font-display text-step-1">Examples for ops teams</h3>
+          <ul class="mt-4 border-t-2 border-ink">
+            {s.useCases.map((u) => (
+              <li class="border-b border-line py-6">
+                <h4 class="text-step-1">{u.title}</h4>
+                <p class="mt-2 text-slate">{u.body}</p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </section>
+  ))}
+
+  <section class="section-y" aria-labelledby="unsure-heading">
+    <div class="page-x max-w-[48rem]!">
+      <h2 id="unsure-heading" class="h-section">Not sure which one you need?</h2>
+      <p class="mt-5 text-step-1 text-slate">
+        That's normal. Tell me what the work looks like today and I'll tell you which approach fits. Often it's a
+        mix: an automation that moves the data, with one AI step in the middle.
+      </p>
+      <div class="mt-8"><BookButton variant="ink" /></div>
+    </div>
+  </section>
+
+  <CtaBand />
+</Base>
