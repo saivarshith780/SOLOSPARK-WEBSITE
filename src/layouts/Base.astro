@@ -3,6 +3,7 @@ import '../styles/global.css';
 import { site } from '../config/site';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import Companion from '../components/Companion.astro';
 import displayFont from '@fontsource-variable/bricolage-grotesque/files/bricolage-grotesque-latin-standard-normal.woff2?url';
 import bodyFont from '@fontsource/atkinson-hyperlegible-next/files/atkinson-hyperlegible-next-latin-400-normal.woff2?url';
 
@@ -141,6 +142,13 @@ const schemas = [business, founder, website, ...jsonLd];
   <body class="flex min-h-dvh flex-col">
     <a href="#main" class="sr-only z-50 rounded-pill bg-snow px-5 py-3 font-bold text-night focus:not-sr-only focus:fixed focus:top-3 focus:left-3">Skip to content</a>
 
+    <!-- Light that stays with the viewport -->
+    <div class="ambient" aria-hidden="true">
+      <div class="glow glow-deep drift-b ambient-a"></div>
+      <div class="glow glow-cobalt drift-a ambient-b"></div>
+      <div class="glow glow-cobalt cursor-light"></div>
+    </div>
+
     <!-- Ambient light behind the header and first section -->
     <div class="sky" aria-hidden="true">
       <div class="sky-beam"></div>
@@ -154,10 +162,42 @@ const schemas = [business, founder, website, ...jsonLd];
       <slot />
     </main>
     <Footer />
+    <Companion />
   </body>
 </html>
 
 <script>
+  // A faint light that drifts after the cursor across the whole page (mouse
+  // only, off under reduced motion). CSS eases the movement, so this only
+  // writes two custom properties per frame while the mouse moves.
+  const cursorLight = document.querySelector<HTMLElement>('.cursor-light');
+  if (
+    cursorLight &&
+    matchMedia('(hover: hover) and (pointer: fine)').matches &&
+    !matchMedia('(prefers-reduced-motion: reduce)').matches
+  ) {
+    let raf = 0;
+    let cx = 0;
+    let cy = 0;
+    const move = () => {
+      raf = 0;
+      cursorLight.style.setProperty('--cx', `${cx}px`);
+      cursorLight.style.setProperty('--cy', `${cy}px`);
+      cursorLight.classList.add('is-on');
+    };
+    document.addEventListener(
+      'pointermove',
+      (e) => {
+        if (e.pointerType !== 'mouse') return;
+        cx = e.clientX;
+        cy = e.clientY;
+        if (!raf) raf = requestAnimationFrame(move);
+      },
+      { passive: true },
+    );
+    document.documentElement.addEventListener('pointerleave', () => cursorLight.classList.remove('is-on'));
+  }
+
   // Cursor-following light on [data-spotlight] cards and panels (mouse only).
   if (matchMedia('(hover: hover) and (pointer: fine)').matches) {
     let frame = 0;

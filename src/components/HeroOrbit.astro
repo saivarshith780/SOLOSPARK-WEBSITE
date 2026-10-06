@@ -1,0 +1,89 @@
+---
+// Decorative light for the right side of inner-page heroes on wide screens:
+// the spark at the center of three orbits, with a few connected nodes riding
+// them (the same idea as the home page circuit, at rest). Rings turn very
+// slowly; under reduced motion it is a still picture.
+import Spark from './Spark.astro';
+---
+<div class="orbit relative aspect-square w-full max-w-[30rem]" aria-hidden="true">
+  <div class="glow glow-cobalt absolute -inset-[18%] opacity-80"></div>
+  <div class="glow glow-spark breathe absolute inset-[34%]"></div>
+  <svg viewBox="0 0 400 400" class="absolute inset-0 h-full w-full overflow-visible">
+    <defs>
+      <radialGradient id="orbit-node">
+        <stop offset="0" stop-color="#dfe5ff"></stop>
+        <stop offset="1" stop-color="#8ea2ff"></stop>
+      </radialGradient>
+    </defs>
+    <circle cx="200" cy="200" r="190" class="ring ring-outer"></circle>
+    <g class="spin spin-slow">
+      <circle cx="200" cy="200" r="140" class="ring ring-dashed"></circle>
+      <circle cx="340" cy="200" r="5" fill="url(#orbit-node)" class="node"></circle>
+      <circle cx="101" cy="101" r="4" fill="url(#orbit-node)" class="node"></circle>
+    </g>
+    <g class="spin spin-rev">
+      <circle cx="200" cy="200" r="92" class="ring"></circle>
+      <circle cx="200" cy="108" r="4.5" fill="#ffc933" class="node node-spark"></circle>
+      <circle cx="135" cy="265" r="3.5" fill="url(#orbit-node)" class="node"></circle>
+    </g>
+    <circle cx="200" cy="200" r="190" class="ring-arc"></circle>
+  </svg>
+  <div class="absolute inset-[40%] flex items-center justify-center">
+    <Spark class="orbit-spark h-full w-full" />
+  </div>
+</div>
+
+<style>
+  .ring {
+    fill: none;
+    stroke: rgb(180 192 240 / 0.2);
+    stroke-width: 1;
+  }
+  .ring-outer {
+    stroke: rgb(180 192 240 / 0.1);
+  }
+  .ring-dashed {
+    stroke-dasharray: 2 8;
+    stroke: rgb(180 192 240 / 0.3);
+  }
+  /* A short arc of light running around the outer ring */
+  .ring-arc {
+    fill: none;
+    stroke: rgb(142 162 255 / 0.65);
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-dasharray: 90 1104;
+    transform-box: view-box;
+    transform-origin: 200px 200px;
+    filter: drop-shadow(0 0 6px rgb(142 162 255 / 0.8));
+  }
+  .node {
+    filter: drop-shadow(0 0 6px rgb(142 162 255 / 0.9));
+  }
+  .node-spark {
+    filter: drop-shadow(0 0 8px rgb(255 201 51 / 0.9));
+  }
+  .spin {
+    transform-box: view-box;
+    transform-origin: 200px 200px;
+  }
+  .orbit :global(.orbit-spark) {
+    filter: drop-shadow(0 0 18px rgb(255 201 51 / 0.6)) drop-shadow(0 0 50px rgb(255 201 51 / 0.3));
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .spin-slow {
+      animation: orbit-spin 120s linear infinite;
+    }
+    .spin-rev {
+      animation: orbit-spin 80s linear infinite reverse;
+    }
+    .ring-arc {
+      animation: orbit-spin 14s linear infinite;
+    }
+  }
+  @keyframes orbit-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+</style>

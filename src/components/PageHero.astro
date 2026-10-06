@@ -1,14 +1,29 @@
 ---
+import HeroOrbit from './HeroOrbit.astro';
 interface Props {
   title: string;
   lede?: string;
+  /** Show the decorative orbit on the right on wide screens (default true). */
+  art?: boolean;
 }
-const { title, lede } = Astro.props;
+const { title, lede, art = true } = Astro.props;
 ---
 <section class="page-hero relative">
-  <div class="page-x pt-16 pb-16 md:pt-24 md:pb-24">
-    <h1 class="type-display text-lit load-in max-w-[16ch]">{title}</h1>
-    {lede && <p class="lede load-in mt-7" style="--d:120ms">{lede}</p>}
-    <div class="load-in" style="--d:220ms"><slot /></div>
+  <div
+    class:list={[
+      'page-x grid items-center gap-x-[clamp(2rem,5vw,6rem)] pt-16 pb-16 md:pt-20 md:pb-20',
+      art && 'lg:min-h-[min(68svh,46rem)] lg:grid-cols-[1.5fr_1fr]',
+    ]}
+  >
+    <div>
+      <h1 class="type-display text-lit load-in max-w-[16ch]">{title}</h1>
+      {lede && <p class="lede load-in mt-7" style="--d:120ms">{lede}</p>}
+      <div class="load-in" style="--d:220ms"><slot /></div>
+    </div>
+    {art && (
+      <div class="load-in hidden justify-end lg:flex" style="--d:200ms">
+        <HeroOrbit />
+      </div>
+    )}
   </div>
 </section>

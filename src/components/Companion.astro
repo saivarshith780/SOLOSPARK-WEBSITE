@@ -1,0 +1,948 @@
+---
+// Spark, the site's companion: a small night fox whose tail tip is the brand
+// spark. It sits in the bottom-right corner of the viewport and reacts to what
+// the visitor does. Everything it does is decoration, so it is hidden from
+// assistive tech and never takes keyboard focus.
+//
+// Layers (outer to inner), so each kind of motion has its own transform:
+//   .companion   fixed box in the corner. Never moves; used to measure the dock.
+//   .fx-dock     slides down to "peek" or "tuck" when content is underneath.
+//   .fx-hop      one-off moves: entrance, hops, the wake-up stretch.
+//   .fx-lean     leans toward whatever it is curious about.
+//   svg groups   head, ears, eyes and tail, each driven by CSS variables.
+//
+// The script only runs on events (pointer, scroll, clicks, a few timers).
+// There is no animation loop: CSS transitions do the easing.
+---
+<div class="companion" data-mode="tuck" data-mood="sleep" aria-hidden="true">
+  <div class="fx-dock">
+    <div class="fx-hop">
+      <div class="fx-lean">
+        <svg class="fx" viewBox="0 0 100 100" focusable="false">
+          <defs>
+            <linearGradient id="fx-fur" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#5a6eea"></stop>
+              <stop offset="1" stop-color="#28369f"></stop>
+            </linearGradient>
+            <linearGradient id="fx-tail-fur" gradientUnits="userSpaceOnUse" x1="58" y1="92" x2="88" y2="50">
+              <stop offset="0" stop-color="#1f2a86"></stop>
+              <stop offset="0.6" stop-color="#3f53d4"></stop>
+              <stop offset="1" stop-color="#b9c5ff"></stop>
+            </linearGradient>
+            <linearGradient id="fx-cream" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#f4f6ff"></stop>
+              <stop offset="1" stop-color="#cdd5f7"></stop>
+            </linearGradient>
+            <radialGradient id="fx-spark-glow">
+              <stop offset="0" stop-color="#ffc933" stop-opacity="0.75"></stop>
+              <stop offset="0.45" stop-color="#ffc933" stop-opacity="0.2"></stop>
+              <stop offset="1" stop-color="#ffc933" stop-opacity="0"></stop>
+            </radialGradient>
+          </defs>
+
+          <!-- Contact shadow -->
+          <ellipse class="fx-shadow" cx="54" cy="96.5" rx="30" ry="2.6"></ellipse>
+
+          <!-- Tail, behind the body. The tip is the spark. -->
+          <g class="fx-tail">
+            <path
+              d="M55 92 C70 96.5 89 93 93.5 78 C97 66.5 93.5 56.5 87 51.5 C88.5 60 86.5 68.5 80.5 74.5 C74.5 80.5 65 84 56 84 Z"
+              fill="url(#fx-tail-fur)"
+              class="fx-rim"
+            ></path>
+            <!-- The spark at the tip of the tail -->
+            <circle class="fx-tail-glow" cx="87" cy="47" r="14" fill="url(#fx-spark-glow)"></circle>
+            <path
+              class="fx-tail-tip"
+              transform="translate(81.5 41.5) scale(0.46)"
+              d="M12 0C12.9 7.2 16.8 11.1 24 12C16.8 12.9 12.9 16.8 12 24C11.1 16.8 7.2 12.9 0 12C7.2 11.1 11.1 7.2 12 0Z"
+            ></path>
+            <g class="fx-sparkles">
+              <path d="M95 35 l1 3 3 1 -3 1 -1 3 -1 -3 -3 -1 3 -1 Z"></path>
+              <path d="M100 47 l.7 2 2 .7 -2 .7 -.7 2 -.7 -2 -2 -.7 2 -.7 Z"></path>
+              <path d="M79 38 l.7 2 2 .7 -2 .7 -.7 2 -.7 -2 -2 -.7 2 -.7 Z"></path>
+            </g>
+          </g>
+
+          <!-- Body -->
+          <g class="fx-body">
+            <path d="M31 93 C28.5 77 34 61 50 59 C66 61 71.5 77 69 93 Z" fill="url(#fx-fur)" class="fx-rim"></path>
+            <path d="M42 93 C41.5 81 45.5 70.5 50 68.5 C54.5 70.5 58.5 81 58 93 Z" fill="url(#fx-cream)" opacity="0.92"></path>
+            <ellipse cx="43" cy="93" rx="5.4" ry="3.1" fill="#e9edff"></ellipse>
+            <ellipse cx="57" cy="93" rx="5.4" ry="3.1" fill="#e9edff"></ellipse>
+          </g>
+
+          <!-- Head -->
+          <g class="fx-head">
+            <g class="fx-head-anim">
+              <g class="fx-ear fx-ear-l">
+                <path d="M30 31 L24 6.5 C30.5 8.5 38 14 41.5 21.5 Z" fill="url(#fx-fur)" class="fx-rim"></path>
+                <path d="M31 27 L27.6 12 C31.4 14 35 17.5 37 21.5 Z" class="fx-ear-in"></path>
+              </g>
+              <g class="fx-ear fx-ear-r">
+                <path d="M70 31 L76 6.5 C69.5 8.5 62 14 58.5 21.5 Z" fill="url(#fx-fur)" class="fx-rim"></path>
+                <path d="M69 27 L72.4 12 C68.6 14 65 17.5 63 21.5 Z" class="fx-ear-in"></path>
+              </g>
+              <path
+                d="M50 18.5 C63 18.5 72 25.5 73 35.5 L78.5 44 C70.5 48.5 62 54.5 50 60.5 C38 54.5 29.5 48.5 21.5 44 L27 35.5 C28 25.5 37 18.5 50 18.5 Z"
+                fill="url(#fx-fur)"
+                class="fx-rim"
+              ></path>
+              <!-- Face mask -->
+              <path
+                d="M21.5 44 C30 47.5 38 54 50 60.5 C62 54 70 47.5 78.5 44 C71 42 63 43.5 57.5 41.5 C55.5 46 53 48 50 48 C47 48 44.5 46 42.5 41.5 C37 43.5 29 42 21.5 44 Z"
+                fill="url(#fx-cream)"
+              ></path>
+              <ellipse class="fx-blush" cx="33.5" cy="47.5" rx="3.6" ry="2"></ellipse>
+              <ellipse class="fx-blush" cx="66.5" cy="47.5" rx="3.6" ry="2"></ellipse>
+
+              <g class="fx-eyes">
+                <g class="fx-eye-open">
+                  <ellipse cx="40" cy="37.5" rx="3.3" ry="4.1" class="fx-ink"></ellipse>
+                  <ellipse cx="60" cy="37.5" rx="3.3" ry="4.1" class="fx-ink"></ellipse>
+                  <circle cx="41.2" cy="35.9" r="1.15" fill="#fff"></circle>
+                  <circle cx="61.2" cy="35.9" r="1.15" fill="#fff"></circle>
+                </g>
+                <g class="fx-eye-happy">
+                  <path d="M36.4 39 Q40 34.4 43.6 39" class="fx-line"></path>
+                  <path d="M56.4 39 Q60 34.4 63.6 39" class="fx-line"></path>
+                </g>
+                <g class="fx-eye-shut">
+                  <path d="M36.4 37.6 Q40 40.6 43.6 37.6" class="fx-line"></path>
+                  <path d="M56.4 37.6 Q60 40.6 63.6 37.6" class="fx-line"></path>
+                </g>
+              </g>
+
+              <path d="M47.4 50.2 Q50 49.2 52.6 50.2 Q51.4 53 50 53.4 Q48.6 53 47.4 50.2 Z" class="fx-ink"></path>
+              <path d="M50 53.4 Q49 55.6 46.8 55 M50 53.4 Q51 55.6 53.2 55" class="fx-line fx-mouth"></path>
+            </g>
+          </g>
+
+          <!-- Sleep -->
+          <g class="fx-zzz">
+            <text x="76" y="22" class="fx-z fx-z1">z</text>
+            <text x="83" y="13" class="fx-z fx-z2">z</text>
+          </g>
+
+          <!-- Hit area for petting (the only part that takes the pointer) -->
+          <ellipse class="fx-hit" cx="52" cy="58" rx="30" ry="38"></ellipse>
+        </svg>
+      </div>
+    </div>
+  </div>
+</div>
+<script is:inline>
+  // Already met on an earlier page this visit: start awake and in place, so the
+  // fox doesn't rise up again on every navigation. Runs before first paint.
+  (function () {
+    try {
+      if (sessionStorage.getItem('fox-greeted') !== '1') return;
+      var c = document.currentScript.previousElementSibling;
+      c.dataset.mode = 'full';
+      c.dataset.mood = 'idle';
+    } catch (e) {}
+  })();
+</script>
+
+<style>
+  /* ---------- Placement ---------- */
+  .companion {
+    --size: clamp(3.4rem, 2.2rem + 3vw, 5.75rem);
+    --lx: 0;
+    --ly: 0;
+    --lean: 0;
+    position: fixed;
+    right: calc(env(safe-area-inset-right, 0px) + clamp(0.4rem, 1.4vw, 1.5rem));
+    bottom: calc(env(safe-area-inset-bottom, 0px) + clamp(0.1rem, 0.6vw, 0.6rem));
+    z-index: 35; /* under the header (40) and its mobile menu */
+    width: var(--size);
+    height: var(--size);
+    pointer-events: none;
+    view-transition-name: companion; /* stays put while pages cross-fade */
+    contain: layout style;
+  }
+  @media (max-width: 30rem) {
+    .companion {
+      --size: 3rem;
+    }
+  }
+  .fx {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+
+  /* Dock: full, peeking over the bottom edge, or tucked out of sight */
+  .fx-dock {
+    height: 100%;
+    transition: translate 650ms var(--ease-out-expo);
+  }
+  .companion[data-mode='peek'] .fx-dock {
+    translate: 0 54%;
+  }
+  .companion[data-mode='tuck'] .fx-dock {
+    translate: 0 118%;
+  }
+  .fx-hop,
+  .fx-lean {
+    height: 100%;
+    transform-origin: 50% 100%;
+  }
+  .fx-lean {
+    translate: calc(var(--lean) * 4%) 0;
+    rotate: calc(var(--lean) * 4deg);
+    transition:
+      translate 500ms var(--ease-out-expo),
+      rotate 500ms var(--ease-out-expo);
+  }
+
+  /* ---------- Paint ---------- */
+  .fx-shadow {
+    fill: rgb(0 0 0 / 0.45);
+    filter: blur(1.2px);
+  }
+  .fx-ink {
+    fill: #0b1030;
+  }
+  .fx-line {
+    fill: none;
+    stroke: #0b1030;
+    stroke-width: 1.9;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .fx-mouth {
+    stroke-width: 1.2;
+    opacity: 0.55;
+  }
+  .fx-ear-in {
+    fill: #a9b8ff;
+    opacity: 0.85;
+  }
+  /* Light from the night sky catching the edges */
+  .fx-rim {
+    stroke: rgb(200 212 255 / 0.38);
+    stroke-width: 0.7;
+    stroke-linejoin: round;
+  }
+  .fx-tail-tip {
+    fill: #ffd257;
+    filter: drop-shadow(0 0 2px rgb(255 201 51 / 0.9));
+  }
+  .fx-tail-glow {
+    opacity: 0.75;
+  }
+  .fx-sparkles path {
+    fill: #ffd257;
+  }
+  .fx-blush {
+    fill: #ffb48a;
+    opacity: 0;
+    transition: opacity 300ms;
+  }
+  .fx-z {
+    font-family: var(--font-display);
+    font-weight: 700;
+    fill: var(--color-mist);
+    opacity: 0;
+  }
+  .fx-z1 {
+    font-size: 9px;
+  }
+  .fx-z2 {
+    font-size: 7px;
+  }
+  .fx-hit {
+    fill: transparent;
+    pointer-events: none;
+    cursor: pointer;
+  }
+  .companion[data-mode='full'] .fx-hit {
+    pointer-events: auto;
+  }
+
+  /* ---------- Parts that move ---------- */
+  .fx-head,
+  .fx-head-anim,
+  .fx-ear,
+  .fx-eyes,
+  .fx-eye-open,
+  .fx-tail,
+  .fx-body,
+  .fx-sparkles path,
+  .fx-z {
+    transform-box: fill-box;
+  }
+  /* Head turns toward what it looks at (--lx, --ly in -1..1) */
+  .fx-head {
+    transform-origin: 50% 92%;
+    translate: calc(var(--lx) * 1.6px) calc(var(--ly) * 1.3px);
+    rotate: calc(var(--lx) * 9deg + var(--tilt, 0deg));
+    transition:
+      translate 420ms var(--ease-out-quart),
+      rotate 520ms var(--ease-out-expo);
+  }
+  .fx-head-anim {
+    transform-origin: 50% 92%;
+  }
+  .fx-eyes {
+    translate: calc(var(--lx) * 2.6px) calc(var(--ly) * 2.1px);
+    transition: translate 260ms var(--ease-out-quart);
+  }
+  .fx-eye-open {
+    transform-origin: 50% 50%;
+  }
+  .fx-eye-happy,
+  .fx-eye-shut {
+    opacity: 0;
+  }
+  .fx-ear-l {
+    transform-origin: 80% 95%;
+    rotate: var(--ear, 0deg);
+  }
+  .fx-ear-r {
+    transform-origin: 20% 95%;
+    rotate: calc(var(--ear, 0deg) * -1);
+  }
+  .fx-ear {
+    transition: rotate 380ms var(--ease-out-expo);
+  }
+  .fx-tail {
+    transform-origin: 8% 88%;
+    rotate: var(--tail, 0deg);
+    transition: rotate 600ms var(--ease-out-expo);
+  }
+  .fx-body {
+    transform-origin: 50% 100%;
+  }
+  .fx-sparkles path {
+    transform-origin: 50% 50%;
+    opacity: 0;
+    scale: 0;
+  }
+
+  /* ---------- Moods ---------- */
+  /* Asleep: eyes shut, head down, ears relaxed */
+  .companion[data-mood='sleep'] .fx-eye-open {
+    opacity: 0;
+  }
+  .companion[data-mood='sleep'] .fx-eye-shut {
+    opacity: 1;
+  }
+  .companion[data-mood='sleep'] {
+    --tilt: -7deg;
+    --ear: -12deg;
+    --tail: 6deg;
+  }
+  .companion[data-mood='sleep'] .fx-head {
+    translate: 0 2.5px;
+  }
+  /* Curious: ears up, head cocked toward what it's looking at */
+  .companion[data-mood='curious'] {
+    --ear: 6deg;
+    --tilt: calc(var(--side, 1) * 7deg);
+  }
+  .companion[data-near] {
+    --ear: 8deg;
+  }
+  /* Happy: smiling eyes, a little blush */
+  .companion[data-mood='happy'] .fx-eye-open {
+    opacity: 0;
+  }
+  .companion[data-mood='happy'] .fx-eye-happy {
+    opacity: 1;
+  }
+  .companion[data-mood='happy'] .fx-blush,
+  .companion.is-petted .fx-blush {
+    opacity: 0.5;
+  }
+  /* Scrolling: ears swept back by the "wind", tail follows */
+  .companion.is-scrolling {
+    --ear: -16deg;
+  }
+  .companion.is-scrolling[data-dir='down'] {
+    --tail: -10deg;
+  }
+  .companion.is-scrolling[data-dir='up'] {
+    --tail: 12deg;
+  }
+
+  /* ---------- Motion (all off under reduced motion) ---------- */
+  @media (prefers-reduced-motion: no-preference) {
+    /* Blink: a quick squash of the open eyes */
+    .companion.is-blink .fx-eye-open {
+      animation: fx-blink 170ms ease-in-out;
+    }
+    /* Idle: slow breathing and an easy tail sway */
+    .companion:not([data-mode='tuck']) .fx-body {
+      animation: fx-breathe 3.6s var(--ease-in-out-sine) infinite alternate;
+    }
+    .companion:not([data-mode='tuck']):not([data-mood='sleep']) .fx-tail-tip,
+    .companion:not([data-mode='tuck']):not([data-mood='sleep']) .fx-tail-glow {
+      animation: fx-glow 2.8s var(--ease-in-out-sine) infinite alternate;
+    }
+    .companion[data-mood='sleep'] .fx-body {
+      animation-duration: 5s;
+    }
+    .companion[data-mood='sleep']:not([data-mode='tuck']) .fx-z1 {
+      animation: fx-z 3.2s ease-out infinite;
+    }
+    .companion[data-mood='sleep']:not([data-mode='tuck']) .fx-z2 {
+      animation: fx-z 3.2s ease-out 1.6s infinite;
+    }
+    /* One-off moves */
+    .companion.is-hop .fx-hop {
+      animation: fx-hop 620ms var(--ease-out-quart);
+    }
+    .companion.is-wake .fx-hop {
+      animation: fx-stretch 900ms var(--ease-out-expo);
+    }
+    .companion.is-notice .fx-head-anim {
+      animation: fx-notice 800ms var(--ease-out-expo);
+    }
+    .companion.is-wag .fx-tail {
+      animation: fx-wag 900ms var(--ease-in-out-sine);
+    }
+    .companion.is-celebrate .fx-sparkles path {
+      animation: fx-sparkle 900ms var(--ease-out-quart) both;
+    }
+    .companion.is-celebrate .fx-sparkles path:nth-child(2) {
+      animation-delay: 90ms;
+    }
+    .companion.is-celebrate .fx-sparkles path:nth-child(3) {
+      animation-delay: 170ms;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .fx-head,
+    .fx-dock,
+    .fx-lean {
+      transition: none;
+    }
+    .fx-head {
+      rotate: var(--tilt, 0deg);
+    }
+    .companion[data-mood='sleep'] .fx-z {
+      opacity: 0.8;
+    }
+  }
+
+  @keyframes fx-blink {
+    50% {
+      scale: 1 0.1;
+    }
+  }
+  @keyframes fx-breathe {
+    from {
+      scale: 1 1;
+    }
+    to {
+      scale: 1.015 1.035;
+    }
+  }
+  @keyframes fx-glow {
+    from {
+      opacity: 0.7;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  @keyframes fx-z {
+    0% {
+      opacity: 0;
+      translate: 0 0;
+    }
+    25% {
+      opacity: 0.9;
+    }
+    100% {
+      opacity: 0;
+      translate: 4px -10px;
+    }
+  }
+  @keyframes fx-hop {
+    0% {
+      transform: translateY(0) scale(1, 1);
+    }
+    18% {
+      transform: translateY(0) scale(1.06, 0.92);
+    }
+    45% {
+      transform: translateY(-16%) scale(0.97, 1.04);
+    }
+    75% {
+      transform: translateY(0) scale(1.04, 0.95);
+    }
+    100% {
+      transform: translateY(0) scale(1, 1);
+    }
+  }
+  @keyframes fx-stretch {
+    0% {
+      transform: scale(1, 1);
+    }
+    35% {
+      transform: scale(0.96, 1.08);
+    }
+    65% {
+      transform: scale(1.03, 0.97);
+    }
+    100% {
+      transform: scale(1, 1);
+    }
+  }
+  @keyframes fx-notice {
+    0% {
+      transform: translateY(0) rotate(0);
+    }
+    40% {
+      transform: translateY(-2.5px) rotate(-5deg);
+    }
+    100% {
+      transform: translateY(0) rotate(0);
+    }
+  }
+  @keyframes fx-wag {
+    0%,
+    100% {
+      transform: rotate(0);
+    }
+    20% {
+      transform: rotate(-14deg);
+    }
+    45% {
+      transform: rotate(12deg);
+    }
+    70% {
+      transform: rotate(-8deg);
+    }
+  }
+  @keyframes fx-sparkle {
+    0% {
+      opacity: 0;
+      scale: 0;
+      translate: 0 0;
+    }
+    35% {
+      opacity: 1;
+      scale: 1.2;
+    }
+    100% {
+      opacity: 0;
+      scale: 0.6;
+      translate: 0 -5px;
+    }
+  }
+</style>
+
+<script>
+  type Mode = 'full' | 'peek' | 'tuck';
+  type Mood = 'sleep' | 'idle' | 'curious' | 'happy';
+
+  const root = document.querySelector<HTMLElement>('.companion');
+
+  if (root) {
+    const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
+    const finePointer = matchMedia('(hover: hover) and (pointer: fine)');
+    const IDLE_MS = 20000;
+    const NEAR_PX = 190;
+
+    let mode = (root.dataset.mode as Mode) || 'tuck';
+    let mood = (root.dataset.mood as Mood) || 'sleep';
+    let awake = false;
+    let curiousTarget: Element | null = null;
+    let pointer: { x: number; y: number } | null = null;
+    let raf = 0;
+    const timers = new Map<string, number>();
+
+    // ---- small helpers ----
+    const later = (key: string, ms: number, fn: () => void) => {
+      clearTimeout(timers.get(key));
+      timers.set(key, window.setTimeout(fn, ms));
+    };
+    const pulse = (cls: string, ms: number) => {
+      root.classList.remove(cls);
+      void root.offsetWidth; // restart the animation if it is already running
+      root.classList.add(cls);
+      later(cls, ms, () => root.classList.remove(cls));
+    };
+    const setMood = (next: Mood) => {
+      mood = next;
+      root.dataset.mood = next;
+    };
+    const setMode = (next: Mode) => {
+      if (next === mode) return;
+      mode = next;
+      root.dataset.mode = next;
+    };
+    const setLook = (lx: number, ly: number) => {
+      root.style.setProperty('--lx', lx.toFixed(3));
+      root.style.setProperty('--ly', ly.toFixed(3));
+    };
+
+    // Where the fox's eyes are, in viewport coordinates (uses the fixed box,
+    // which never moves, so this is stable whatever the fox is doing).
+    const eyePoint = () => {
+      const r = root.getBoundingClientRect();
+      return { x: r.left + r.width * 0.5, y: r.top + r.height * 0.38, r };
+    };
+
+    // Look toward a point. Direction comes from the angle; strength fades in
+    // over the first 90px so the eyes don't jitter when the cursor is close.
+    const lookAt = (x: number, y: number) => {
+      const e = eyePoint();
+      const dx = x - e.x;
+      const dy = y - e.y;
+      const d = Math.hypot(dx, dy) || 1;
+      const k = Math.min(1, d / 90);
+      setLook((dx / d) * k, (dy / d) * k);
+      root.toggleAttribute('data-near', d < NEAR_PX);
+      root.style.setProperty('--side', dx < 0 ? '-1' : '1');
+    };
+    const lookAtEl = (el: Element) => {
+      const r = el.getBoundingClientRect();
+      lookAt(r.left + r.width / 2, r.top + r.height / 2);
+    };
+
+    const blink = () => {
+      if (mood === 'sleep' || mood === 'happy') return;
+      pulse('is-blink', 200);
+    };
+    const scheduleBlink = () => {
+      later('blink-loop', 2800 + Math.random() * 3600, () => {
+        if (!document.hidden) {
+          blink();
+          if (Math.random() < 0.25) later('blink2', 260, blink); // sometimes a double blink
+        }
+        scheduleBlink();
+      });
+    };
+
+    // ---- staying out of the way ----
+    // Anything a visitor reads or uses counts as content. The fox only shows
+    // in full where nothing like that is underneath it; otherwise it peeks
+    // over the bottom edge, and if even that would cover something, it tucks
+    // away completely.
+    const CONTENT =
+      'a,button,input,textarea,select,label,summary,[role="button"],[tabindex]:not([tabindex="-1"]),img,video,canvas,svg[role="img"],.btn,.chip,.tag';
+
+    const hasTextIn = (el: Element, box: DOMRect) => {
+      for (const node of el.childNodes) {
+        if (node.nodeType !== Node.TEXT_NODE || !node.textContent?.trim()) continue;
+        const range = document.createRange();
+        range.selectNodeContents(node);
+        for (const t of range.getClientRects()) {
+          if (t.right > box.left && t.left < box.right && t.bottom > box.top && t.top < box.bottom) return true;
+        }
+      }
+      return false;
+    };
+
+    const covers = (box: DOMRect) => {
+      const cols = 4;
+      const rows = 4;
+      const seen = new Set<Element>();
+      for (let i = 0; i < cols; i++) {
+        for (let j = 0; j < rows; j++) {
+          const x = box.left + ((i + 0.5) / cols) * box.width;
+          const y = box.top + ((j + 0.5) / rows) * box.height;
+          if (x < 0 || y < 0 || x >= innerWidth || y >= innerHeight) continue;
+          const el = document.elementsFromPoint(x, y).find((n) => !root.contains(n));
+          if (!el || seen.has(el)) continue;
+          seen.add(el);
+          if (el.closest(CONTENT)) return true;
+          if (hasTextIn(el, box)) return true;
+        }
+      }
+      return false;
+    };
+
+    const dockBoxes = () => {
+      const r = root.getBoundingClientRect();
+      // Full: the whole fox. Peek: the strip that still shows when it ducks.
+      const full = new DOMRect(r.left - 4, r.top - 4, r.width + 8, r.height + 8);
+      const visible = r.height * 0.48;
+      const peek = new DOMRect(r.left - 4, r.bottom - visible - 4, r.width + 8, visible + 4);
+      return { full, peek };
+    };
+
+    // Ducking is immediate (never cover content, even for a moment). Coming
+    // back up waits until the spot has been clear for a beat, so the fox
+    // doesn't bob up and down while content scrolls past.
+    const RANK: Record<Mode, number> = { tuck: 0, peek: 1, full: 2 };
+    let forcedTuck = false; // mobile menu open, or typing on a phone
+    const placeNow = () => {
+      if (!awake) return;
+      let next: Mode = 'tuck';
+      if (!forcedTuck) {
+        const { full, peek } = dockBoxes();
+        next = !covers(full) ? 'full' : !covers(peek) ? 'peek' : 'tuck';
+      }
+      if (RANK[next] < RANK[mode]) {
+        clearTimeout(timers.get('rise'));
+        setMode(next);
+      } else if (RANK[next] > RANK[mode]) {
+        later('rise', root.classList.contains('is-scrolling') ? 420 : 160, () => {
+          const { full, peek } = dockBoxes();
+          const still = forcedTuck ? 'tuck' : !covers(full) ? 'full' : !covers(peek) ? 'peek' : 'tuck';
+          setMode(RANK[still] < RANK[next] ? still : next);
+        });
+      }
+    };
+    // At most one check every 120ms while scrolling, plus one at the end.
+    let lastPlace = 0;
+    const place = () => {
+      const wait = 120 - (performance.now() - lastPlace);
+      if (wait > 0) return later('place', wait, place);
+      lastPlace = performance.now();
+      requestAnimationFrame(placeNow);
+    };
+
+    // ---- moods over time ----
+    const goIdle = () => {
+      later('idle', IDLE_MS, () => {
+        // Nobody around: curl up and doze.
+        curiousTarget = null;
+        root.style.setProperty('--lean', '0');
+        setLook(0, 0.5);
+        setMood('sleep');
+        clearTimeout(timers.get('blink-loop'));
+      });
+    };
+
+    const wake = (quiet = false) => {
+      if (mood !== 'sleep') return;
+      setMood('idle');
+      setLook(0, 0);
+      if (!quiet) {
+        pulse('is-wake', 950);
+        later('wake-blink', 380, blink);
+      }
+      scheduleBlink();
+    };
+
+    // Any sign of the visitor: wake up (if needed) and restart the idle clock.
+    const activity = () => {
+      if (!awake) return;
+      if (mood === 'sleep') wake();
+      goIdle();
+    };
+
+    const happy = (ms = 1100) => {
+      setMood('happy');
+      later('mood', ms, () => setMood(curiousTarget ? 'curious' : 'idle'));
+    };
+
+    // ---- first appearance ----
+    // The first time on the site it wakes up and looks around; when moving
+    // between pages it is simply there (the page transition keeps it in place).
+    const greeted = (() => {
+      try {
+        return sessionStorage.getItem('fox-greeted') === '1';
+      } catch {
+        return false;
+      }
+    })();
+
+    const start = () => {
+      awake = true;
+      placeNow();
+      if (greeted || reduceMotion.matches) {
+        if (mood === 'sleep') wake(true);
+        else scheduleBlink();
+      } else {
+        try {
+          sessionStorage.setItem('fox-greeted', '1');
+        } catch {
+          /* private mode: it will just greet again */
+        }
+        // Rises up asleep, wakes, glances left and right, then settles.
+        later('greet-wake', 900, () => {
+          wake();
+          later('greet-l', 700, () => setLook(-0.9, -0.1));
+          later('greet-r', 1350, () => setLook(0.7, -0.35));
+          later('greet-c', 2000, () => {
+            setLook(0, 0);
+            pulse('is-wag', 950);
+          });
+        });
+      }
+      goIdle();
+    };
+
+    // ---- the visitor's actions ----
+    const flushPointer = () => {
+      raf = 0;
+      if (!pointer || mood === 'sleep') return;
+      if (curiousTarget) lookAtEl(curiousTarget);
+      else lookAt(pointer.x, pointer.y);
+    };
+
+    document.addEventListener(
+      'pointermove',
+      (e) => {
+        if (e.pointerType !== 'mouse') return;
+        pointer = { x: e.clientX, y: e.clientY };
+        activity();
+        if (!raf) raf = requestAnimationFrame(flushPointer);
+      },
+      { passive: true },
+    );
+
+    // Curious about things you can press: looks at them and leans in.
+    const INTERESTING = '.btn, .nav-link, [data-companion-look]';
+    document.addEventListener('pointerover', (e) => {
+      if (e.pointerType !== 'mouse' || !awake) return;
+      const t = (e.target as Element).closest?.(INTERESTING);
+      if (!t || t === curiousTarget) return;
+      curiousTarget = t;
+      if (mood !== 'happy') setMood('curious');
+      lookAtEl(t);
+      const r = t.getBoundingClientRect();
+      const e2 = eyePoint();
+      root.style.setProperty('--lean', String(Math.sign(r.left + r.width / 2 - e2.x) * 0.6));
+    });
+    document.addEventListener('pointerout', (e) => {
+      if (!curiousTarget) return;
+      const to = e.relatedTarget as Element | null;
+      if (to && curiousTarget.contains(to)) return;
+      if ((e.target as Element).closest?.(INTERESTING) !== curiousTarget) return;
+      curiousTarget = null;
+      root.style.setProperty('--lean', '0');
+      if (mood === 'curious') setMood('idle');
+    });
+
+    // Keyboard users get the same curiosity when they tab to a button.
+    document.addEventListener('focusin', (e) => {
+      const t = e.target as Element;
+      if (!awake) return;
+      activity();
+      if (t.matches?.('input, textarea, select') && !finePointer.matches) {
+        forcedTuck = true; // the on-screen keyboard needs the room
+        place();
+        return;
+      }
+      if (t.closest?.(INTERESTING)) lookAtEl(t);
+    });
+    document.addEventListener('focusout', () => {
+      if (forcedTuck && !document.querySelector('.menu-btn[aria-expanded="true"]')) {
+        forcedTuck = false;
+        place();
+      }
+    });
+
+    // Clicks: a hop for buttons and links, a glance for anything else,
+    // and a happy wiggle if you pet the fox itself.
+    document.addEventListener(
+      'pointerdown',
+      (e) => {
+        if (!awake) return;
+        activity();
+        const t = e.target as Element;
+        if (root.contains(t)) {
+          happy(1400);
+          root.classList.add('is-petted');
+          later('petted', 1400, () => root.classList.remove('is-petted'));
+          pulse('is-hop', 650);
+          pulse('is-wag', 950);
+          pulse('is-celebrate', 1200);
+          return;
+        }
+        lookAt(e.clientX, e.clientY);
+        if (t.closest('a, button, .btn, summary')) {
+          later('react', 120, () => {
+            pulse('is-hop', 650);
+            happy(900);
+          });
+        } else {
+          blink();
+        }
+      },
+      { passive: true },
+    );
+
+    // Hovering the fox: it notices you.
+    const hit = root.querySelector('.fx-hit');
+    hit?.addEventListener('pointerenter', () => {
+      if (mood === 'sleep') wake();
+      root.classList.add('is-petted');
+      pulse('is-wag', 950);
+    });
+    hit?.addEventListener('pointerleave', () => root.classList.remove('is-petted'));
+
+    // Scrolling: ears swept back while moving, a look up when a new section
+    // arrives, and a fresh check of what's underneath.
+    let lastY = scrollY;
+    window.addEventListener(
+      'scroll',
+      () => {
+        const y = scrollY;
+        root.dataset.dir = y > lastY ? 'down' : 'up';
+        lastY = y;
+        root.classList.add('is-scrolling');
+        later('scroll-end', 180, () => {
+          root.classList.remove('is-scrolling');
+          place();
+        });
+        activity();
+        place();
+      },
+      { passive: true },
+    );
+
+    if ('IntersectionObserver' in window) {
+      let lastNotice = 0;
+      const io = new IntersectionObserver(
+        (entries) => {
+          if (!awake || mood === 'sleep') return;
+          const now = performance.now();
+          if (now - lastNotice < 2500) return;
+          if (!entries.some((en) => en.isIntersecting)) return;
+          lastNotice = now;
+          pulse('is-notice', 850);
+          if (!pointer && !curiousTarget) {
+            // On touch screens there is no cursor to watch: glance up instead.
+            setLook(-0.25, -0.8);
+            later('notice-back', 900, () => !curiousTarget && setLook(0, 0));
+          }
+        },
+        { rootMargin: '0px 0px -55% 0px' },
+      );
+      document.querySelectorAll('main > section, main > article').forEach((s) => io.observe(s));
+    }
+
+    // Layout can change without a scroll: FAQ answers opening, window size.
+    document.addEventListener('toggle', place, true);
+    window.addEventListener('resize', place, { passive: true });
+    document.addEventListener('keydown', activity);
+    document.addEventListener('touchstart', activity, { passive: true });
+
+    // Mobile menu open: get out of the way.
+    const menuBtn = document.querySelector('.menu-btn');
+    if (menuBtn) {
+      new MutationObserver(() => {
+        forcedTuck = menuBtn.getAttribute('aria-expanded') === 'true';
+        place();
+      }).observe(menuBtn, { attributes: true, attributeFilter: ['aria-expanded'] });
+    }
+
+    // Tab in the background: stop the blink timer; resume quietly.
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) clearTimeout(timers.get('blink-loop'));
+      else if (awake && mood !== 'sleep') scheduleBlink();
+    });
+
+    // Seen before this visit: it's already in place, so start right away.
+    // First visit: wait for fonts and layout so the entrance lands right.
+    if (greeted) {
+      start();
+      window.addEventListener('load', place, { once: true });
+    } else {
+      const begin = () => later('start', 450, start);
+      if (document.readyState === 'complete') begin();
+      else window.addEventListener('load', begin, { once: true });
+    }
+  }
+</script>
